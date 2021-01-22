@@ -1,5 +1,5 @@
 export type ParsedDeepLinkType = {
-  token: string | string[] | null | undefined;
+  token: string | undefined;
   protocol: string | undefined;
   action: string | undefined;
 };

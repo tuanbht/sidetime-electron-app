@@ -1,3 +1,4 @@
+import api from "../services/api";
 import { observable, runInAction, makeObservable, action } from "mobx";
 import { persist } from "mobx-persist";
 import { RootStoreType } from "../types/stores/RootStore";
@@ -16,17 +17,32 @@ class AuthStore implements AuthStoreType {
       currentUser: observable,
       login: action,
       logout: action,
-      checkSignedInUser: action,
+      checkLoggedInUser: action,
     });
   }
 
   public login = async (params: LoginFormType): Promise<void> => {
-    runInAction(() => {
-      this.currentUser = { token: "123" };
+    return new Promise((resolve, reject) => {
+      api.sessions
+        .create(params)
+        .then((response) => {
+          runInAction(() => (this.currentUser = response));
+          resolve();
+        })
+        .catch((err) => {
+          reject(err);
+          this.currentUser = null;
+        });
     });
   };
-  public logout = async (): Promise<void> => {};
-  public checkSignedInUser = async (): Promise<void> => {};
+
+  public logout = async (): Promise<void> => {
+    runInAction(() => (this.currentUser = null));
+  };
+
+  public checkLoggedInUser = (): boolean => {
+    return !!this.currentUser;
+  };
 }
 
 export default AuthStore;

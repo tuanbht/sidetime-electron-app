@@ -8,7 +8,7 @@ export type StoreProperties = {
 export type StorePublicInterface = {
   login: (loginForm: LoginFormType) => Promise<void>;
   logout: () => Promise<void>;
-  checkSignedInUser: () => Promise<void>;
+  checkLoggedInUser: () => boolean;
 };
 
 export type AuthStoreType = StoreProperties & StorePublicInterface;

@@ -1,13 +1,15 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { ParsedDeepLinkType } from "../types/deeplink";
+import { AuthStoreType } from "../types/stores/AuthStore";
 
 const REQUEST_INTERCEPTORS = {
   auth: (config: AxiosRequestConfig) => {
-    const value = localStorage.getItem("deepLink");
+    const value = localStorage.getItem("authStore");
 
     if (value) {
-      const deepLink: ParsedDeepLinkType = JSON.parse(value);
-      config.headers["Authorization"] = `Bearer ${deepLink.token}`;
+      const authStore: AuthStoreType = JSON.parse(value);
+      config.headers[
+        "Authorization"
+      ] = `Bearer ${authStore.currentUser?.token}`;
     }
     return config;
   },

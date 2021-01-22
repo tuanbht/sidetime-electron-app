@@ -1,5 +1,31 @@
 export type UserType = {
+  id: string;
+  name: string;
+  email: string;
+  avatar_url: string;
+  location: string;
+  timezone: string;
+  headline: string;
+  organization: string;
+  bio: string;
   token: string;
+  expert_profile:
+    | {
+        id: string;
+        slug: string;
+        status: string;
+        flexible_schedule: boolean;
+        tags: string[];
+        keywords: string[];
+        years_of_experience: number;
+        price_cents: number;
+        minimum_time_in_minutes: number;
+        profile_visibility: string;
+        featured: boolean;
+        known_for: string;
+        approved_at: null;
+      }
+    | undefined;
 };
 
 export type SiteType = {
