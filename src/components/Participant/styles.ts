@@ -6,3 +6,8 @@ export const StyledContainer = styled.div`
   flex-direction: column;
   align-items: flex-start;
 `;
+
+export const ParticipantVideoFeed = styled.video`
+  width: 500px;
+  height: 500px;
+`;

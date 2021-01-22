@@ -4,19 +4,18 @@ import { ButtonStyleType } from "../../types/components/Button";
 
 export const ButtonContainer = styled.button<ButtonStyleType>`
   display: flex;
-  width: 100%;
   height: 34px;
   text-align: center;
   justify-content: center;
   align-items: center;
   border: 0px;
+  border-radius: 5px;
   background-color: ${({
     theme: {
       palette: { redDisabled, orangish },
     },
     disabled,
   }): string => (disabled ? redDisabled : orangish)};
-  border-radius: 5px;
   &:hover {
     background-color: ${({
       theme: {

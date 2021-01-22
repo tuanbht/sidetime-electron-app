@@ -14,6 +14,7 @@ export type ThemeEntryType = {
     darkGrey: string;
     slateGrey: string;
     blueGrey: string;
+    white: string;
   };
   fonts: {};
 };

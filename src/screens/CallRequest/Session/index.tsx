@@ -8,12 +8,16 @@ import Video, {
 } from "twilio-video";
 
 import { CallRequestSessionScreenPropsType } from "../../../types/screens/CallRequest";
-import { StyledContainer } from "./styles";
+import { StyledContainer, ParticipantsContainer } from "./styles";
 import { createTokenForRoom } from "../../../utils/twilio";
+import useAppContext from "../../../hooks/useAppContext";
+import { useHistory } from "react-router-dom";
 
 const CallRequestSessionScreen: React.FC<CallRequestSessionScreenPropsType> = (
   props
 ) => {
+  const history = useHistory();
+  const { callRequestStore } = useAppContext();
   const [room, setRoom] = useState<Room | null>();
   const [participants, setParticipants] = useState<ParticipantType[]>([]);
 
@@ -31,10 +35,10 @@ const CallRequestSessionScreen: React.FC<CallRequestSessionScreenPropsType> = (
   ));
 
   useEffect(() => {
-    if (!props.callRequest) return;
+    if (!callRequestStore.callRequest) return;
     const {
       callRequest: { my_role, requester, expert, slug },
-    } = props;
+    } = callRequestStore;
     const token = createTokenForRoom(
       my_role === "requester" ? requester.name : expert.name,
       slug
@@ -58,26 +62,36 @@ const CallRequestSessionScreen: React.FC<CallRequestSessionScreenPropsType> = (
         return null;
       });
     };
-  }, [props]);
+  }, [callRequestStore]);
 
   return (
     <StyledContainer>
-      <button onClick={props.onCallRequestSessionEnd}>Leave</button>
-      {room ? (
-        <>
-          <Participant
-            key={room.localParticipant.sid}
-            participant={room.localParticipant}
-            onScreenShare={async (track: LocalVideoTrack) => {
-              track.once("stopped", () => {
-                room.localParticipant.unpublishTrack(track);
-              });
-              room.localParticipant.publishTrack(track);
-            }}
-          />
-        </>
-      ) : null}
-      {remoteParticipants}
+      <button
+        onClick={() => {
+          callRequestStore.setCallRequest(undefined);
+          history.push("/call_requests");
+        }}
+      >
+        Leave
+      </button>
+      <ParticipantsContainer>
+        {room ? (
+          <>
+            <Participant
+              key={room.localParticipant.sid}
+              participant={room.localParticipant}
+              onScreenShare={async (track: LocalVideoTrack) => {
+                track.once("stopped", () => {
+                  room.localParticipant.unpublishTrack(track);
+                });
+                room.localParticipant.publishTrack(track);
+              }}
+              local
+            />
+          </>
+        ) : null}
+        {remoteParticipants}
+      </ParticipantsContainer>
     </StyledContainer>
   );
 };

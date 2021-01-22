@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
 import * as ScreenShare from "../../utils/screenshare";
-import { StyledContainer } from "./styles";
+import { StyledContainer, ParticipantVideoFeed } from "./styles";
 import { DesktopCapturerSource } from "electron";
 import { LocalVideoTrack, LocalAudioTrack } from "twilio-video";
 import { ParticipantPropsType } from "../../types/components/Participant";
+import window from "../../utils/window";
 
 const Participant: React.FC<ParticipantPropsType> = ({
   participant,
+  local = false,
   onScreenShare,
 }) => {
   const [videoTracks, setVideoTracks] = useState<any[]>([]);
@@ -17,8 +19,8 @@ const Participant: React.FC<ParticipantPropsType> = ({
   const [desktopVideoTrack, setDesktopVideoTrack] = useState<LocalVideoTrack>();
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
-  const [isMicEnabled, setIsMicEnabled] = useState<boolean>(true);
-  const [isCamEnabled, setIsCamEnabled] = useState<boolean>(true);
+  const [isMicEnabled, setIsMicEnabled] = useState<boolean>(false);
+  const [isCamEnabled, setIsCamEnabled] = useState<boolean>(false);
   const [isShareScreenEnabled, setIsShareScreenEnable] = useState<boolean>(
     false
   );
@@ -28,6 +30,19 @@ const Participant: React.FC<ParticipantPropsType> = ({
       .map((publication: any) => publication.track)
       .filter((track) => track !== null);
   };
+
+  useEffect(() => {
+    if (window.platform === "darwin" && local) {
+      window.ipc.on(`request-media-access-return`, (_event, isGranted) => {
+        setIsCamEnabled(isGranted);
+        setIsMicEnabled(isGranted);
+      });
+      window.ipc.send(`request-media-access`);
+    } else {
+      setIsMicEnabled(true);
+      setIsCamEnabled(true);
+    }
+  }, [local]);
 
   useEffect(() => {
     const trackSubscribed = (track: any) => {
@@ -59,34 +74,44 @@ const Participant: React.FC<ParticipantPropsType> = ({
     };
   }, [participant]);
 
+  // local
   useEffect(() => {
+    // if(!isCamEnabled) return;
     const videoTrack = videoTracks.length > 1 ? videoTracks[1] : videoTracks[0];
     if (videoTrack) {
-      videoTrack.attach(videoRef.current);
-      setIsCamEnabled(videoTrack.isEnabled);
+      if (isCamEnabled) videoTrack.attach(videoRef.current);
+      else videoTrack.detach();
+      // videoTrack.attach(videoRef.current);
+      // setIsCamEnabled(videoTrack.isEnabled);
       return () => {
         videoTrack.detach();
       };
     }
-  }, [videoTracks]);
+  }, [isCamEnabled, videoTracks]);
 
+  //local
   useEffect(() => {
+    // if(!isMicEnabled) return;
     const audioTrack = audioTracks[0];
     if (audioTrack) {
-      audioTrack.attach(audioRef.current);
-      setIsMicEnabled(audioTrack.isEnabled);
+      if (isMicEnabled) audioTrack.attach(audioRef.current);
+      else audioTrack.detach();
+      // audioTrack.attach(audioRef.current);
+      // setIsMicEnabled(audioTrack.isEnabled);
       return () => {
         audioTrack.detach();
       };
     }
-  }, [audioTracks]);
+  }, [isMicEnabled, audioTracks]);
 
+  // remote
   useEffect(() => {
     if (audioTracks[0] && audioTracks[0] instanceof LocalAudioTrack) {
       audioTracks[0].enable(isMicEnabled);
     }
   }, [audioTracks, isMicEnabled]);
 
+  // remote
   useEffect(() => {
     if (videoTracks[0] && videoTracks[0] instanceof LocalVideoTrack) {
       videoTracks[0].enable(isCamEnabled);
@@ -107,18 +132,22 @@ const Participant: React.FC<ParticipantPropsType> = ({
   return (
     <StyledContainer>
       <h3>{participant.identity}</h3>
-      <video ref={videoRef} autoPlay={true} />
+      <ParticipantVideoFeed ref={videoRef} autoPlay={true} />
       <audio ref={audioRef} autoPlay={true} />
-      <button onClick={() => setIsMicEnabled(!isMicEnabled)}>
-        {isMicEnabled ? "MUTE" : "UNMUTE"}
-      </button>
-      <button onClick={() => setIsCamEnabled(!isCamEnabled)}>
-        {isCamEnabled ? "HIDE" : "SHOW"}
-      </button>
-      <button onClick={() => setIsShareScreenEnable(!isShareScreenEnabled)}>
+      {local ? (
+        <div>
+          <button onClick={() => setIsMicEnabled(!isMicEnabled)}>
+            {isMicEnabled ? "MUTE" : "UNMUTE"}
+          </button>
+          <button onClick={() => setIsCamEnabled(!isCamEnabled)}>
+            {isCamEnabled ? "HIDE" : "SHOW"}
+          </button>
+        </div>
+      ) : null}
+      {/* <button onClick={() => setIsShareScreenEnable(!isShareScreenEnabled)}>
         {isShareScreenEnabled ? "HIDE SCREEN" : "SHARE SCREEN"}
-      </button>
-      {desktopSources.map((source) => {
+      </button> */}
+      {/* {desktopSources.map((source) => {
         return (
           <div
             onClick={async () => {
@@ -137,7 +166,7 @@ const Participant: React.FC<ParticipantPropsType> = ({
             <br />
           </div>
         );
-      })}
+      })} */}
     </StyledContainer>
   );
 };

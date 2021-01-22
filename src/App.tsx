@@ -1,5 +1,6 @@
 import React, { useEffect, useCallback } from "react";
 import ElectronWindow from "./utils/window";
+import Layout from "./components/Layout";
 import AppRouter from "./routes";
 import useAppContext from "./hooks/useAppContext";
 import { IpcRendererEvent } from "electron";
@@ -20,7 +21,11 @@ const App: React.FC = () => {
     ElectronWindow.ipc.send("ready-for-deep-link");
   }, [onLinkReceived]);
 
-  return <AppRouter />;
+  return (
+    <Layout>
+      <AppRouter />
+    </Layout>
+  );
 };
 
 export default App;

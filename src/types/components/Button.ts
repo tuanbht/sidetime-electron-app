@@ -6,7 +6,9 @@ export type ButtonStyleType = {
 };
 
 export type ButtonPropsType = ButtonStyleType & {
-  text: string;
+  text?: string;
+  icon?: React.ReactElement;
   isLoading?: boolean;
+  buttonTextCss?: CSSProp;
   onClick: () => void;
 };

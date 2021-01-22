@@ -9,10 +9,10 @@ const AppRouter: React.FC = () => {
   return (
     <Router>
       <Switch>
-        <ProtectedRoute path="/call_requests">
+        <ProtectedRoute path="/call_requests" exact>
           <CallRequestListScreen />
         </ProtectedRoute>
-        <ProtectedRoute path="/call_requests/:id">
+        <ProtectedRoute path="/call_requests/:id" exact>
           <CallRequestSessionScreen />
         </ProtectedRoute>
         <Route path="/">

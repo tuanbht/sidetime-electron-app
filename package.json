@@ -16,6 +16,7 @@
     "@types/styled-components": "^5.1.4",
     "@types/twilio-video": "^2.7.2",
     "axios": "^0.21.0",
+    "dayjs": "^1.10.3",
     "electron-is-dev": "^1.2.0",
     "formik": "^2.2.6",
     "mobx": "^6.0.4",
@@ -24,6 +25,7 @@
     "query-string": "^6.13.7",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "react-feather": "^2.0.9",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.1",
     "styled-components": "^5.2.1",
@@ -98,6 +100,13 @@
     "appId": "com.startuplandia.sidetime_app",
     "productName": "SideTime",
     "copyright": "Copyright © 2020 ${author}",
+    "mac": {
+      "entitlements": "entitlements.mac.plist",
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "We need access to your microphone so people you talk to in a Sidetime call can hear you.",
+        "NSCameraUsageDescription": "We need access to your camera so people you talk to in a Sidetime call can see you."
+      }
+    },
     "files": [
       "build/**/*",
       "node_modules/**/*"

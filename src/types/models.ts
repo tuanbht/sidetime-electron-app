@@ -64,7 +64,12 @@ export type CallRequestType = {
   scheduled_at: string;
   site: SiteType;
   slug: string;
-  status: string;
+  status:
+    | "live"
+    | "pending_expert_acceptance"
+    | "pending_requester"
+    | "scheduled"
+    | "completed";
   updated_at: string;
   videoconference: boolean;
   my_role: "requester" | "expert";

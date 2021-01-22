@@ -6,9 +6,11 @@ import { ButtonContainer, buttonTextTypographyStyles } from "./styles";
 
 const Button: React.FC<ButtonPropsType> = ({
   text,
+  icon,
   isLoading = false,
   disabled = false,
   css,
+  buttonTextCss,
   onClick,
 }) => {
   return (
@@ -21,11 +23,16 @@ const Button: React.FC<ButtonPropsType> = ({
       {isLoading ? (
         <LoadingIcon />
       ) : (
-        <Typography
-          variant="bold"
-          text={text}
-          css={buttonTextTypographyStyles}
-        />
+        <>
+          {icon}
+          {text ? (
+            <Typography
+              variant="bold"
+              text={text}
+              css={buttonTextCss || buttonTextTypographyStyles}
+            />
+          ) : null}
+        </>
       )}
     </ButtonContainer>
   );

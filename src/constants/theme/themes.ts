@@ -14,6 +14,7 @@ const themes = [
       grey100: "#b9bec7",
       black: "#000000",
       green: "#15a850",
+      greenActive: "#0f7e3c",
       red: "#e11b00",
       redDisabled: "#ea9e94",
       greenDisabled: "#a3d2b6",

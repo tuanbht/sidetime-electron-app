@@ -1,7 +1,9 @@
 import AuthStore from "./AuthStore";
+import CallRequestStore from "./CallRequestStore";
 import { create } from "mobx-persist";
 import { observable, makeObservable } from "mobx";
 import { AuthStoreType } from "../types/stores/AuthStore";
+import { CallRequestStoreType } from "../types/stores/CallRequestStore";
 import { RootStoreType } from "../types/stores/RootStore";
 
 const resume = create({
@@ -11,9 +13,11 @@ const resume = create({
 
 class RootStore implements RootStoreType {
   public readonly authStore: AuthStoreType;
+  public readonly callRequestStore: CallRequestStoreType;
 
   constructor() {
     this.authStore = new AuthStore(this);
+    this.callRequestStore = new CallRequestStore(this);
     makeObservable(this, {
       authStore: observable,
     });

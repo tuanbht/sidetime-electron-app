@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, ipcMain, systemPreferences } = require("electron");
 const path = require("path");
 const isDev = require("electron-is-dev");
 
@@ -26,13 +26,36 @@ const createWindow = () => {
       ? "http://localhost:3000"
       : `file://${path.join(__dirname, "../build/index.html")}`
   );
-  if (isDev) mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
   mainWindow.on("closed", () => (mainWindow = null));
 
   const deepLink = openedURL || process.argv[1];
   ipcMain.on("ready-for-deep-link", () => {
     mainWindow.webContents.send("deep-link", deepLink);
   });
+
+  // ipcMain.on("media-access-status", (event) => {
+  //   event.returnValue =
+  //     process.platform == "darwin"
+  //       ? systemPreferences.getMediaAccessStatus("camera") &&
+  //         systemPreferences.getMediaAccessStatus("microphone")
+  //       : true;
+  // });
+
+  ipcMain.on("request-media-access", async () => {
+    let isGranted = false;
+
+    if (process.platform === "darwin") {
+      isGranted = await systemPreferences.askForMediaAccess("microphone");
+      isGranted =
+        (await systemPreferences.askForMediaAccess("camera")) && isGranted;
+    } else {
+      isGranted = true;
+    }
+
+    mainWindow.webContents.send("request-media-access-return", isGranted);
+  });
+
   log("deeplink url: " + deepLink);
 };
 
