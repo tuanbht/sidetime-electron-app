@@ -7,11 +7,11 @@ import Video, {
   LocalVideoTrack,
 } from "twilio-video";
 
-import { CallRequestSessionScreenProps } from "../../../types/screens/CallRequest";
+import { CallRequestSessionScreenPropsType } from "../../../types/screens/CallRequest";
 import { StyledContainer } from "./styles";
 import { createTokenForRoom } from "../../../utils/twilio";
 
-const CallRequestSessionScreen: React.FC<CallRequestSessionScreenProps> = (
+const CallRequestSessionScreen: React.FC<CallRequestSessionScreenPropsType> = (
   props
 ) => {
   const [room, setRoom] = useState<Room | null>();
@@ -31,6 +31,7 @@ const CallRequestSessionScreen: React.FC<CallRequestSessionScreenProps> = (
   ));
 
   useEffect(() => {
+    if (!props.callRequest) return;
     const {
       callRequest: { my_role, requester, expert, slug },
     } = props;

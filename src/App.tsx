@@ -1,22 +1,15 @@
 import React, { useState, useEffect } from "react";
 import ElectronWindow from "./utils/window";
-import CallRequestListScreen from "./screens/CallRequest/List";
-import CallRequestSessionScreen from "./screens/CallRequest/Session";
-import HomeScreen from "./screens/Home";
-
+import AppRouter from "./routes";
 import { IpcRendererEvent } from "electron";
 import { parseDeepLink } from "./utils/deeplink";
-import { ParsedDeepLink } from "./types/deeplink";
-import { CallRequest } from "./types/models";
+import { ParsedDeepLinkType } from "./types/deeplink";
+import { CallRequestType } from "./types/models";
 
 const App: React.FC = () => {
-  const [deepLink, setDeepLink] = useState<ParsedDeepLink>();
-  const [callRequest, setCallRequest] = useState<CallRequest>();
+  const [deepLink, setDeepLink] = useState<ParsedDeepLinkType>();
+  const [callRequest, setCallRequest] = useState<CallRequestType>();
 
-  const onCallRequestSelect = (cr: CallRequest) => setCallRequest(cr);
-  const onCallRequestSessionEnd = () => {
-    setCallRequest(undefined);
-  };
   const onLinkReceived = (_event: IpcRendererEvent, link: string) => {
     const parsed = parseDeepLink(link);
     setDeepLink(parsed);
@@ -28,19 +21,7 @@ const App: React.FC = () => {
     ElectronWindow.ipc.send("ready-for-deep-link");
   }, []);
 
-  if (callRequest)
-    return (
-      <CallRequestSessionScreen
-        callRequest={callRequest}
-        onCallRequestSessionEnd={onCallRequestSessionEnd}
-      />
-    );
-  else if (
-    deepLink?.protocol === "sidetime:" &&
-    deepLink.action === "//call_requests"
-  )
-    return <CallRequestListScreen onCallRequestSelect={onCallRequestSelect} />;
-  else return <HomeScreen />;
+  return <AppRouter />;
 };
 
 export default App;

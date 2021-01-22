@@ -1,2 +1,2 @@
-import { ComposedWindow } from "../types/window";
-export default window as ComposedWindow;
+import { ComposedWindowType } from "../types/window";
+export default window as ComposedWindowType;

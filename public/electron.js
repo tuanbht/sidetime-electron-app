@@ -14,8 +14,8 @@ const log = (s) => {
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
-    width: 900,
-    height: 680,
+    width: 1280,
+    height: 720,
     webPreferences: {
       preload: path.resolve(__dirname, "electron-preload.js"),
     },

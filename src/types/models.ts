@@ -1,22 +1,26 @@
-export type Site = {
+export type UserType = {
+  token: string;
+};
+
+export type SiteType = {
   id: number;
   name: string;
 };
 
-export type Expert = {
+export type ExpertType = {
   id: number;
   name: string;
 };
 
-export type Requester = {
+export type RequesterType = {
   id: number;
   name: string;
 };
 
-export type CallRequest = {
+export type CallRequestType = {
   id: number;
-  requester: Requester;
-  expert: Expert;
+  requester: RequesterType;
+  expert: ExpertType;
   call_type: string;
   calls_count: number;
   charges_count: number;
@@ -32,7 +36,7 @@ export type CallRequest = {
   price_cents: number;
   proposed_times: string[];
   scheduled_at: string;
-  site: Site;
+  site: SiteType;
   slug: string;
   status: string;
   updated_at: string;

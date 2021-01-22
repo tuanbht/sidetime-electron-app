@@ -1,7 +1,7 @@
 import { request } from "../../../utils/axios";
-import { CallRequest } from "../../../types/models";
+import { CallRequestType } from "../../../types/models";
 
-const index = (): Promise<CallRequest[]> =>
+const index = (): Promise<CallRequestType[]> =>
   new Promise((resolve, reject) => {
     request
       .api()

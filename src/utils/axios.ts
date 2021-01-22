@@ -1,12 +1,12 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { ParsedDeepLink } from "../types/deeplink";
+import { ParsedDeepLinkType } from "../types/deeplink";
 
 const REQUEST_INTERCEPTORS = {
   auth: (config: AxiosRequestConfig) => {
     const value = localStorage.getItem("deepLink");
 
     if (value) {
-      const deepLink: ParsedDeepLink = JSON.parse(value);
+      const deepLink: ParsedDeepLinkType = JSON.parse(value);
       config.headers["Authorization"] = `Bearer ${deepLink.token}`;
     }
     return config;

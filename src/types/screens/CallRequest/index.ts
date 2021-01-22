@@ -1,10 +1,10 @@
-import { CallRequest } from "../../../types/models";
+import { CallRequestType } from "../../../types/models";
 
-export type CallRequestListScreenProps = {
-  onCallRequestSelect: (callRequest: CallRequest) => void;
+export type CallRequestListScreenPropsType = {
+  onCallRequestSelect?: (callRequest: CallRequestType) => void;
 };
 
-export type CallRequestSessionScreenProps = {
-  callRequest: CallRequest;
-  onCallRequestSessionEnd: () => void;
+export type CallRequestSessionScreenPropsType = {
+  callRequest?: CallRequestType;
+  onCallRequestSessionEnd?: () => void;
 };

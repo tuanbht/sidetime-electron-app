@@ -1,6 +1,6 @@
 import { IpcRenderer, DesktopCapturer } from "electron";
 
-export type ComposedWindow = Window &
+export type ComposedWindowType = Window &
   typeof globalThis & {
     ipc: IpcRenderer;
     desktopCapturer: DesktopCapturer;

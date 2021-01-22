@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from "react";
 import api from "../../../services/api";
 
-import { CallRequest } from "../../../types/models";
-import { CallRequestListScreenProps } from "../../../types/screens/CallRequest";
+import { CallRequestType } from "../../../types/models";
+import { CallRequestListScreenPropsType } from "../../../types/screens/CallRequest";
 import { StyledContainer } from "./styles";
 
-const CallRequestListScreen: React.FC<CallRequestListScreenProps> = (props) => {
-  const [callRequests, setCallRequests] = useState<CallRequest[]>();
+const CallRequestListScreen: React.FC<CallRequestListScreenPropsType> = (
+  props
+) => {
+  const [callRequests, setCallRequests] = useState<CallRequestType[]>();
 
-  const onCallSelect = (call: CallRequest) => {
+  const onCallSelect = (call: CallRequestType) => {
+    if (!props.onCallRequestSelect) return;
     props.onCallRequestSelect(call);
   };
 

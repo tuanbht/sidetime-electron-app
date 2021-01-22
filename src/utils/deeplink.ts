@@ -1,7 +1,7 @@
-import { ParsedDeepLink } from "../types/deeplink";
+import { ParsedDeepLinkType } from "../types/deeplink";
 import qs from "query-string";
 
-export const parseDeepLink = (deepLink: string): ParsedDeepLink => {
+export const parseDeepLink = (deepLink: string): ParsedDeepLinkType => {
   try {
     const url = new URL(deepLink || "");
     const parsed = qs.parse(url.search);

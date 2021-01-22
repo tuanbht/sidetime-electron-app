@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
-import { DesktopCapturerSource } from "electron";
-import { LocalVideoTrack, LocalAudioTrack } from "twilio-video";
-import { ParticipantProps } from "../../types/components/Participant";
 import * as ScreenShare from "../../utils/screenshare";
 import { StyledContainer } from "./styles";
+import { DesktopCapturerSource } from "electron";
+import { LocalVideoTrack, LocalAudioTrack } from "twilio-video";
+import { ParticipantPropsType } from "../../types/components/Participant";
 
-const Participant: React.FC<ParticipantProps> = ({
+const Participant: React.FC<ParticipantPropsType> = ({
   participant,
   onScreenShare,
 }) => {

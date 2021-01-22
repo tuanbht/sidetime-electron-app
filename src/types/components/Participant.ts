@@ -1,6 +1,6 @@
 import { Participant, LocalVideoTrack } from "twilio-video";
 
-export type ParticipantProps = {
+export type ParticipantPropsType = {
   participant: Participant;
   onScreenShare?: (stream: LocalVideoTrack) => void;
 };
