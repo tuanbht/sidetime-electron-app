@@ -23,6 +23,7 @@ const borderColorResolver = (
 
 export const StyledInput = styled.input<InputStylePropsType>`
   height: 35px;
+  min-height: 35px;
   font-family: ${({ theme: { fonts } }): string => fonts.neuzeitGrotesk};
   border: solid 1px;
   border-radius: 5px;
@@ -30,6 +31,28 @@ export const StyledInput = styled.input<InputStylePropsType>`
     borderColorResolver(isFocused, hasError, palette)};
   margin-top: 8px;
   padding-left: 8px;
+`;
+
+export const StyledTextArea = styled.textarea<InputStylePropsType>`
+  font-family: ${({ theme: { fonts } }): string => fonts.neuzeitGrotesk};
+  border: solid 1px;
+  border-radius: 5px;
+  border-color: ${({ theme: { palette }, isFocused, hasError }): string =>
+    borderColorResolver(isFocused, hasError, palette)};
+  margin-top: 8px;
+  padding: 8px 8px;
+  resize: none;
+`;
+
+export const StyledSelect = styled.select<InputStylePropsType>`
+  font-family: ${({ theme: { fonts } }): string => fonts.neuzeitGrotesk};
+  border: solid 1px;
+  border-radius: 5px;
+  border-color: ${({ theme: { palette }, isFocused, hasError }): string =>
+    borderColorResolver(isFocused, hasError, palette)};
+  margin-top: 8px;
+  padding: 8px 8px;
+  resize: none;
 `;
 
 export const StyledError = styled.big<InputStylePropsType>`

@@ -13,3 +13,5 @@ export const NOT_VALID_CREDENTIALS =
 export const NO_PENDING_CALLS = "No pending calls";
 export const NO_SCHEDULED_CALLS = "No scheduled calls";
 export const NO_COMPLETED_CALLS = "No completed calls";
+export const NO_DECLINED_CALLS = "No declined calls";
+export const NO_CANCELED_CALLS = "No canceled calls";

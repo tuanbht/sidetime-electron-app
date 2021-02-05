@@ -12,7 +12,9 @@ export type InputStylePropsType = StyledElementPropsType &
   };
 
 export type InputPropsType = InputStyleType & {
-  label: string;
+  type?: "text-area" | "text" | "select" | "date";
+  label?: string;
+  placeholder?: string;
   value: string;
   onChange: (text: string) => void;
   onFocus?: (e: React.FocusEvent) => void;
@@ -21,5 +23,8 @@ export type InputPropsType = InputStyleType & {
   editable?: boolean;
   defaultValue?: string;
   refInput?: any;
+  min?: string;
   error?: string;
+  numRows?: number;
+  children?: any;
 };

@@ -1,8 +1,33 @@
-import React from "react";
+import React, { useEffect } from "react";
+import Notification from "../Notification";
+import useAppContext from "../../hooks/useAppContext";
+import { observer } from "mobx-react-lite";
 import { StyledContainer } from "./styles";
+import { request } from "../../utils/axios";
+import { AxiosError } from "axios";
 
 const Layout: React.FC = (props) => {
-  return <StyledContainer>{props.children}</StyledContainer>;
+  const {
+    notificationStore: { notification },
+    notificationStore,
+  } = useAppContext();
+
+  useEffect(() => {
+    request.api().interceptors.response.use(undefined, (error: AxiosError) => {
+      if (error.response?.status !== 500) return;
+
+      notificationStore.setErrorNotification(
+        "Oops, something went wrong! Please, try again later."
+      );
+    });
+  }, [notificationStore]);
+
+  return (
+    <StyledContainer>
+      {notification ? <Notification notification={notification} /> : null}
+      {props.children}
+    </StyledContainer>
+  );
 };
 
-export default Layout;
+export default observer(Layout);

@@ -4,6 +4,7 @@ import { CalendarIconStyleType } from "../../types/components/CalendarIcon";
 export const StyledContainer = styled.div<CalendarIconStyleType>`
   width: 70px;
   text-align: center;
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.1);
 `;
 export const MonthContainer = styled.div<CalendarIconStyleType>`
   padding: 7px 0px;

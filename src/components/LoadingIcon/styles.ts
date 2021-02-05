@@ -15,6 +15,6 @@ export const LoaderContainer = styled.div<StyledElementPropsType>`
   height: 16px;
   width: 16px;
   border: 3px solid ${({ theme: { palette } }) => palette.white};
-  border-top: 3px solid ${({ theme: { palette } }) => palette.redDisabled};
-  background-color: ${({ theme: { palette } }) => palette.redDisabled};
+  border-top: 3px solid ${({ theme: { palette } }) => palette.transparent};
+  background-color: ${({ theme: { palette } }) => palette.transparent};
 `;

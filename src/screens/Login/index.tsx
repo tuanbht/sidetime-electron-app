@@ -21,7 +21,7 @@ import {
 } from "./styles";
 
 const LoginScreen: React.FC = () => {
-  const { authStore } = useAppContext();
+  const { authStore, isLoading } = useAppContext();
   const history = useHistory();
 
   const form = useFormik({
@@ -41,6 +41,7 @@ const LoginScreen: React.FC = () => {
     history.push("/call_requests");
   }, [history, authStore, authStore.currentUser]);
 
+  if (isLoading) return <span>...Loading</span>;
   return (
     <StyledContainer>
       <Logo src={SideTimeLogo} />

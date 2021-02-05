@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import React, {
   useState,
   useEffect,
@@ -10,6 +11,8 @@ import { InputPropsType } from "../../types/components/Input";
 import {
   StyledContainer,
   StyledInput,
+  StyledTextArea,
+  StyledSelect,
   StyledError,
   formLabelTypographyStyles,
 } from "./styles";
@@ -20,16 +23,21 @@ export interface InputInterface {
 
 const Input: ForwardRefRenderFunction<InputInterface, InputPropsType> = (
   {
+    type = "text",
     label,
+    placeholder,
     value,
+    min = dayjs().add(1, "day").format("YYYY-MM-DD"),
     error,
     refInput,
     editable = true,
     secureText = false,
     css,
+    numRows,
     onChange,
     onFocus,
     onBlur,
+    children,
   },
   ref
 ): JSX.Element => {
@@ -49,29 +57,49 @@ const Input: ForwardRefRenderFunction<InputInterface, InputPropsType> = (
     return { setError };
   });
 
+  const inputProps = {
+    onChange: (e: any) => {
+      setInnerValue(e.target.value);
+      onChange(e.target.value);
+    },
+    value: innerValue,
+    placeholder: placeholder,
+    min: min,
+    disabled: !editable,
+    type: secureText ? "password" : type,
+    onFocus: (event: any): void => {
+      if (onFocus !== undefined) onFocus(event);
+      setFocused(true);
+    },
+    onBlur: (event: any): void => {
+      if (onBlur !== undefined) onBlur(event);
+      setFocused(false);
+    },
+    hasError: !!innerError,
+    isFocused: isFocused,
+    ref: refInput,
+  };
+
+  const renderInput = () => {
+    if (type === "text-area") {
+      return <StyledTextArea {...inputProps} rows={numRows} />;
+    } else if (type === "select") {
+      return <StyledSelect {...inputProps}>{children}</StyledSelect>;
+    }
+
+    return <StyledInput {...inputProps} />;
+  };
+
   return (
     <StyledContainer css={css || ""}>
-      <Typography variant="bold" text={label} css={formLabelTypographyStyles} />
-      <StyledInput
-        onChange={(e) => {
-          setInnerValue(e.target.value);
-          onChange(e.target.value);
-        }}
-        value={innerValue}
-        disabled={!editable}
-        type={secureText ? "password" : "text"}
-        onFocus={(event): void => {
-          if (onFocus !== undefined) onFocus(event);
-          setFocused(true);
-        }}
-        onBlur={(event): void => {
-          if (onBlur !== undefined) onBlur(event);
-          setFocused(false);
-        }}
-        hasError={!!innerError}
-        isFocused={isFocused}
-        ref={refInput}
-      />
+      {label ? (
+        <Typography
+          variant="bold"
+          text={label}
+          css={formLabelTypographyStyles}
+        />
+      ) : null}
+      {renderInput()}
       {innerError && <StyledError>{innerError}</StyledError>}
     </StyledContainer>
   );

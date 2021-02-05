@@ -1,6 +1,14 @@
-const { app, BrowserWindow, ipcMain, systemPreferences } = require("electron");
+const {
+  app,
+  BrowserWindow,
+  ipcMain,
+  systemPreferences,
+  protocol,
+} = require("electron");
 const path = require("path");
+const url = require("url");
 const isDev = require("electron-is-dev");
+const Rollbar = require("rollbar");
 
 let mainWindow;
 let openedURL;
@@ -12,6 +20,17 @@ const log = (s) => {
   }
 };
 
+// eslint-disable-next-line
+const rollbar = Rollbar.init({
+  accessToken: "7418a61c1f5745e6b44bf02ca30f1124",
+  enabled: !isDev,
+  captureUncaught: true,
+  captureUnhandledRejections: true,
+  payload: {
+    platform: "client",
+  },
+});
+
 const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 1280,
@@ -21,26 +40,25 @@ const createWindow = () => {
     },
   });
   mainWindow.setMenu(null);
-  mainWindow.loadURL(
-    isDev
-      ? "http://localhost:3000"
-      : `file://${path.join(__dirname, "../build/index.html")}`
-  );
-  mainWindow.webContents.openDevTools();
+
+  if (isDev) {
+    mainWindow.loadURL("http://localhost:3000");
+    mainWindow.webContents.openDevTools();
+  } else {
+    mainWindow.loadURL(
+      url.format({
+        pathname: "index.html",
+        protocol: "file",
+        slashes: true,
+      })
+    );
+  }
   mainWindow.on("closed", () => (mainWindow = null));
 
   const deepLink = openedURL || process.argv[1];
   ipcMain.on("ready-for-deep-link", () => {
     mainWindow.webContents.send("deep-link", deepLink);
   });
-
-  // ipcMain.on("media-access-status", (event) => {
-  //   event.returnValue =
-  //     process.platform == "darwin"
-  //       ? systemPreferences.getMediaAccessStatus("camera") &&
-  //         systemPreferences.getMediaAccessStatus("microphone")
-  //       : true;
-  // });
 
   ipcMain.on("request-media-access", async () => {
     let isGranted = false;
@@ -80,6 +98,18 @@ app.on("open-url", (event, url) => {
   log("open-url# " + url);
 });
 
-app.on("ready", createWindow);
+app.on("ready", () => {
+  protocol.interceptFileProtocol(
+    "file",
+    (request, callback) => {
+      const urlWithoutProtocol = request.url.substr(7);
+      callback({ path: path.normalize(`${__dirname}/${urlWithoutProtocol}`) });
+    },
+    (err) => {
+      if (err) console.error("Failed to register protocol");
+    }
+  );
+  createWindow();
+});
 app.on("activate", () => !mainWindow && createWindow());
 app.on("window-all-closed", () => app.quit());

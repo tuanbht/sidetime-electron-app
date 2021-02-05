@@ -69,8 +69,14 @@ export type CallRequestType = {
     | "pending_expert_acceptance"
     | "pending_requester"
     | "scheduled"
-    | "completed";
+    | "completed"
+    | "declined"
+    | "canceled";
   updated_at: string;
   videoconference: boolean;
   my_role: "requester" | "expert";
+};
+
+export type TokenType = {
+  token: string;
 };
