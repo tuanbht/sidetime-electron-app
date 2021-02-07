@@ -63,7 +63,7 @@ Format all the ts, js, tsx, jsx, css, json, md, html and, yml files. All thanks 
 
 ## About certificates
 
-On macOS, [electron-builder](https://www.electron.build/) expects two certificates, *Developer ID Application* and *3rd Party Mac Developer Application*, to be present on the Keychain Access. In scenarios where a specification of the certificates are necessary, the env variables *CSC_LINK* and *CSC_KEY_PASSWORD* can be specified. To export both certificates into a single *.p12* file, follow this [guide](https://www.electron.build/code-signing#how-to-export-certificate-on-macos).
+On macOS, [electron-builder](https://www.electron.build/) expects two certificates, _Developer ID Application_ and _3rd Party Mac Developer Application_, to be present on the Keychain Access. In scenarios where a specification of the certificates are necessary, the env variables _CSC_LINK_ and _CSC_KEY_PASSWORD_ can be specified. To export both certificates into a single _.p12_ file, follow this [guide](https://www.electron.build/code-signing#how-to-export-certificate-on-macos).
 
 ## Learn More
 
