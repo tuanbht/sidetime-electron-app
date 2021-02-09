@@ -5,22 +5,38 @@ import AppRouter from "./routes";
 import useAppContext from "./hooks/useAppContext";
 import { IpcRendererEvent } from "electron";
 import { parseDeepLink } from "./utils/deeplink";
+import { observer } from "mobx-react-lite";
 
 const App: React.FC = () => {
-  const { authStore } = useAppContext();
+  const { authStore, deeplinkStore, setIsLoading, isLoading } = useAppContext();
   const onLinkReceived = useCallback(
-    (_event: IpcRendererEvent, link: string) => {
+    async (_event: IpcRendererEvent, link: string) => {
       const parsed = parseDeepLink(link);
-      if (parsed.token) authStore.login({ token: parsed.token });
+
+      if (!parsed.token) {
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
+      await authStore.logout();
+      await deeplinkStore.setDeeplink(parsed);
+      await authStore.login({ token: parsed.token });
+      setIsLoading(false);
     },
-    [authStore]
+    [authStore, deeplinkStore, setIsLoading]
   );
+
+  useEffect(() => {
+    setIsLoading(true);
+  }, [setIsLoading]);
 
   useEffect(() => {
     ElectronWindow.ipc.on("deep-link", onLinkReceived);
     ElectronWindow.ipc.send("ready-for-deep-link");
   }, [onLinkReceived]);
 
+  if (isLoading) return null;
   return (
     <Layout>
       <AppRouter />
@@ -28,4 +44,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export default observer(App);

@@ -29,6 +29,7 @@ import {
   CALL_REQUEST_SCHEDULED,
   CALL_REQUEST_CANCELED,
   CALL_REQUEST_DECLINED,
+  CALL_REQUEST_PAUSED,
 } from "../../../constants/states";
 import { CallRequestType } from "../../../types/models";
 import { CallRequestListScreenPropsType } from "../../../types/screens/CallRequest";
@@ -138,7 +139,8 @@ const CallRequestListScreen: React.FC<CallRequestListScreenPropsType> = () => {
     if (!callRequests) return [];
 
     const live = callRequests?.filter(
-      ({ status }) => status === CALL_REQUEST_LIVE
+      ({ status }) =>
+        status === CALL_REQUEST_LIVE || status === CALL_REQUEST_PAUSED
     );
     const scheduled = callRequests?.filter(
       ({ status }) => status === CALL_REQUEST_SCHEDULED

@@ -33,9 +33,10 @@ import {
   callNameTypographyStyles,
   callTypeTypographStyles,
   callBillingTypographStyles,
+  minutesRemainingTypographStyles,
   labelTypographStyles,
 } from "./styles";
-import { CALL_REQUEST_LIVE } from "../../constants/states";
+import { CALL_REQUEST_LIVE, CALL_REQUEST_PAUSED } from "../../constants/states";
 import {
   DECLINE_CALL_BUTTON,
   VIEW_CALL_PROPOSED_TIMES_BUTTON,
@@ -57,9 +58,9 @@ const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
   const declineCallRef = useRef<ModalInterface>(null);
   const cancellCallRef = useRef<ModalInterface>(null);
   const refundCallRef = useRef<ModalInterface>(null);
+
   const history = useHistory();
   const {
-    callRequestStore,
     authStore: { currentUser },
   } = useAppContext();
   const {
@@ -71,6 +72,7 @@ const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
     duration_in_mins,
     proposed_times,
     total_cost_cents,
+    minutes_used,
   } = callRequest;
 
   const getCallRequestTimestamp = () => {
@@ -101,12 +103,8 @@ const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
       checkProposedTimesRef.current?.open();
     const onCancelButtonClick = () => cancellCallRef.current?.open();
     const onRescheduleButtonClick = () => rescheduleCallRef.current?.open();
-    const onFinishButtonClick = () => () =>
-      markAsCompleteModalRef.current?.open();
-    const onJoinCallButtonClick = () => {
-      callRequestStore.setCallRequest(callRequest);
-      history.push(`/call_requests/${id}`);
-    };
+    const onFinishButtonClick = () => markAsCompleteModalRef.current?.open();
+    const onJoinCallButtonClick = () => history.push(`/call_requests/${id}`);
 
     actions = [
       [DECLINE_CALL_BUTTON, onDeclineButtonClick],
@@ -152,7 +150,7 @@ const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
                 )}`}
                 css={callNameTypographyStyles}
               />
-              {status === CALL_REQUEST_LIVE ? (
+              {[CALL_REQUEST_LIVE, CALL_REQUEST_PAUSED].includes(status) ? (
                 <Typography
                   variant="bold"
                   text="Live"
@@ -206,7 +204,16 @@ const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
               css={labelTypographStyles}
             />
           </PriceContainer>
-          <ActionsContainer>{renderActions()}</ActionsContainer>
+          <ActionsContainer>
+            {[CALL_REQUEST_LIVE, CALL_REQUEST_PAUSED].includes(status) ? (
+              <Typography
+                variant="regular"
+                text={`${duration_in_mins - minutes_used} min remaining`}
+                css={minutesRemainingTypographStyles}
+              />
+            ) : null}
+            {renderActions()}
+          </ActionsContainer>
         </BillingContainer>
       </RightContainer>
       <Modal ref={markAsCompleteModalRef}>

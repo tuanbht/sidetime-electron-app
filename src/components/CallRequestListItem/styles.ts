@@ -96,6 +96,13 @@ export const callBillingTypographStyles = css`
   color: ${({ theme: { palette } }): string => palette.black};
 `;
 
+export const minutesRemainingTypographStyles = css`
+  font-size: 16px;
+  line-height: 16px;
+  margin-right: 10px;
+  color: ${({ theme: { palette } }): string => palette.black};
+`;
+
 export const labelTypographStyles = css`
   font-size: 12px;
   line-height: 12px;

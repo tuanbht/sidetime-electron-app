@@ -21,26 +21,28 @@ class CallRequestStore implements CallRequestStoreType {
     makeObservable(this, {
       callRequest: observable,
       callRequests: observable,
-      setCallRequest: action,
       fetchCallRequests: action,
     });
   }
 
-  public setCallRequest = (selectedCall: CallRequestType | undefined) => {
-    runInAction(() => (this.callRequest = selectedCall));
+  public fetchCallRequest = (id: string): Promise<CallRequestType> => {
+    return new Promise((resolve, reject) => {
+      api.callRequests
+        .get(parseInt(id))
+        .then((callRequest) => resolve(callRequest))
+        .catch((err) => reject(err));
+    });
   };
 
   public fetchCallRequests = (): Promise<CallRequestType[]> => {
     return new Promise((resolve, reject) => {
       api.callRequests
         .index()
-        .then((response) => {
-          runInAction(() => (this.callRequests = response));
-          resolve(response);
+        .then((callRequests) => {
+          runInAction(() => (this.callRequests = callRequests));
+          resolve(callRequests);
         })
-        .catch((err) => {
-          reject(err);
-        });
+        .catch((err) => reject(err));
     });
   };
 
@@ -126,6 +128,32 @@ class CallRequestStore implements CallRequestStoreType {
         .then((callRequest) => {
           this.findAndUpdateCallRequests(callRequest);
           resolve();
+        })
+        .catch((err) => reject(err));
+    });
+  };
+
+  public setCallRequestAsStarted = (
+    callRequest: CallRequestType
+  ): Promise<CallRequestType> => {
+    return new Promise((resolve, reject) => {
+      api.callRequests
+        .start(callRequest.id)
+        .then((callRequest) => {
+          resolve(callRequest);
+        })
+        .catch((err) => reject(err));
+    });
+  };
+
+  public setCallRequestAsPaused = (
+    callRequest: CallRequestType
+  ): Promise<CallRequestType> => {
+    return new Promise((resolve, reject) => {
+      api.callRequests
+        .pause(callRequest.id)
+        .then((callRequest) => {
+          resolve(callRequest);
         })
         .catch((err) => reject(err));
     });

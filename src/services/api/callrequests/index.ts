@@ -10,6 +10,15 @@ const index = (): Promise<CallRequestType[]> =>
       .catch((res) => reject(res.response));
   });
 
+const get = (id: number): Promise<CallRequestType> =>
+  new Promise((resolve, reject) => {
+    request
+      .api()
+      .get(`/api/v1/call_requests/${id}`)
+      .then((res) => resolve(res.data))
+      .catch((res) => reject(res.response));
+  });
+
 const update = (id: number, params: any): Promise<CallRequestType> =>
   new Promise((resolve, reject) => {
     request
@@ -82,8 +91,27 @@ const createToken = (id: number, params: any): Promise<TokenType> =>
       .catch((res) => reject(res.response));
   });
 
+const start = (id: number): Promise<CallRequestType> =>
+  new Promise((resolve, reject) => {
+    request
+      .api()
+      .patch(`/api/v1/call_requests/${id}/start`)
+      .then((res) => resolve(res.data))
+      .catch((res) => reject(res.response));
+  });
+
+const pause = (id: number): Promise<CallRequestType> =>
+  new Promise((resolve, reject) => {
+    request
+      .api()
+      .patch(`/api/v1/call_requests/${id}/pause`)
+      .then((res) => resolve(res.data))
+      .catch((res) => reject(res.response));
+  });
+
 const callRequests = {
   index,
+  get,
   update,
   accept,
   decline,
@@ -92,6 +120,8 @@ const callRequests = {
   refund,
   bounce,
   createToken,
+  start,
+  pause,
 };
 
 export default callRequests;

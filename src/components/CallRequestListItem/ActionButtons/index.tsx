@@ -18,6 +18,7 @@ import {
   CALL_REQUEST_PENDING_EXPERT,
   CALL_REQUEST_PENDING_REQUESTER,
   CALL_REQUEST_SCHEDULED,
+  CALL_REQUEST_PAUSED,
 } from "../../../constants/states";
 import {
   actionIconStyles,
@@ -121,7 +122,8 @@ export const MARK_CALL_FINISHED_BUTTON = {
     />
   ),
   validate: (callRequest: CallRequestType, _currentUser: UserType) =>
-    callRequest.status === CALL_REQUEST_LIVE,
+    callRequest.status === CALL_REQUEST_LIVE ||
+    callRequest.status === CALL_REQUEST_PAUSED,
 };
 
 export const JOIN_CALL_BUTTON = {
@@ -135,7 +137,9 @@ export const JOIN_CALL_BUTTON = {
     />
   ),
   validate: (callRequest: CallRequestType, _currentUser: UserType) =>
-    callRequest.status === CALL_REQUEST_LIVE && callRequest.videoconference,
+    (callRequest.status === CALL_REQUEST_LIVE ||
+      callRequest.status === CALL_REQUEST_PAUSED) &&
+    callRequest.videoconference,
 };
 
 export const COMMENTS_CALL_BUTTON = {

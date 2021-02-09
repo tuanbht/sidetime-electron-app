@@ -4,7 +4,6 @@ import Button from "../../../../components/Button";
 import Typography from "../../../../components/Typography";
 import Countdown from "../../../../components/Countdown";
 import HorizontalDivider from "../../../../components/HorizontalDivider";
-import useAppContext from "../../../../hooks/useAppContext";
 import window from "../../../../utils/window";
 import * as ScreenShare from "../../../../utils/screenshare";
 import { StrongTypedMap } from "../../../../types/map";
@@ -68,8 +67,12 @@ type ActionButtonMap = StrongTypedMap<
 >;
 
 const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
-  const { participant, callRequest } = props;
-  const { callRequestStore } = useAppContext();
+  const {
+    participant,
+    callRequest,
+    countdownRef,
+    onEndCallButtonClick,
+  } = props;
 
   const [isMicEnabled, setIsMicEnabled] = useState<boolean>(false);
   const [isCamEnabled, setIsCamEnabled] = useState<boolean>(false);
@@ -102,7 +105,6 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
   };
 
   const onClosingCallTimerExpired = () => {
-    callRequestStore.setCallRequest(undefined);
     history.push("/call_requests");
   };
 
@@ -263,6 +265,7 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
           <LeftContainer>
             <CounterContainer>
               <Countdown
+                ref={countdownRef}
                 countdownInSeconds={callDurantionInSecondsLeft()}
                 timers={createTimersForCallRequest(
                   callRequest,
@@ -277,8 +280,8 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
               <Button
                 text="END CALL"
                 onClick={() => {
-                  callRequestStore.setCallRequest(undefined);
                   history.push("/call_requests");
+                  if (onEndCallButtonClick) onEndCallButtonClick();
                 }}
                 css={endCallButtonStyles}
               />

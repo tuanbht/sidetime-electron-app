@@ -21,7 +21,7 @@ import {
 } from "./styles";
 
 const LoginScreen: React.FC = () => {
-  const { authStore, isLoading } = useAppContext();
+  const { authStore, deeplinkStore } = useAppContext();
   const history = useHistory();
 
   const form = useFormik({
@@ -38,10 +38,14 @@ const LoginScreen: React.FC = () => {
 
   useEffect(() => {
     if (!authStore.checkLoggedInUser()) return;
-    history.push("/call_requests");
-  }, [history, authStore, authStore.currentUser]);
+    const { deeplink } = deeplinkStore;
 
-  if (isLoading) return <span>...Loading</span>;
+    if (deeplink?.call_request_id) {
+      history.push(`/call_requests/${deeplink.call_request_id}`);
+      deeplinkStore.clearDeeplink();
+    } else history.push("/call_requests");
+  }, [history, authStore, deeplinkStore, authStore.currentUser]);
+
   return (
     <StyledContainer>
       <Logo src={SideTimeLogo} />

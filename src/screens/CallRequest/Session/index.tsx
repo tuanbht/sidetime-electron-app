@@ -1,10 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Typography from "../../../components/Typography";
 import LocalParticipant from "./LocalParticipant";
 import RemoteParticipant from "./RemoteParticipant";
 import useAppContext from "../../../hooks/useAppContext";
 import logo from "../../../assets/logo.png";
-import { CallRequestSessionScreenPropsType } from "../../../types/screens/CallRequest";
+import { CallRequestType } from "../../../types/models";
+import { useParams } from "react-router-dom";
+import {
+  CallRequestSessionScreenPropsType,
+  CallRequestSessionScreenRouteParams,
+} from "../../../types/screens/CallRequest";
 import {
   StyledContainer,
   LogoContainer,
@@ -18,37 +23,77 @@ import Video, {
   RemoteParticipant as RemoteParticipantType,
   LocalDataTrack,
 } from "twilio-video";
+import { CountdownInterface } from "../../../components/Countdown";
 
 const CallRequestSessionScreen: React.FC<CallRequestSessionScreenPropsType> = (
   props
 ) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [room, setRoom] = useState<Room | null>();
-  const [
-    remoteParticipant,
-    setRemoteParticipant,
-  ] = useState<RemoteParticipantType>();
   const [
     localParticipant,
     setLocalParticipant,
   ] = useState<LocalParticipantType>();
-  const {
-    callRequestStore: { callRequest },
-    callRequestStore,
-  } = useAppContext();
+  const [
+    remoteParticipant,
+    setRemoteParticipant,
+  ] = useState<RemoteParticipantType>();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [room, setRoom] = useState<Room>();
+  const [callRequest, setCallRequest] = useState<CallRequestType>();
+  const countdownRef = useRef<CountdownInterface>(null);
+  const params = useParams<CallRequestSessionScreenRouteParams>();
+  const { callRequestStore } = useAppContext();
 
-  const onParticipantConnected = (participant: RemoteParticipantType) => {
-    setRemoteParticipant(participant);
-  };
+  const onParticipantConnected = useCallback(
+    (participant: RemoteParticipantType) => {
+      setRemoteParticipant(participant);
 
-  const onParticipantDisconnected = (_participant: ParticipantType) => {
-    setRemoteParticipant(undefined);
-  };
+      if (!callRequest) return;
+      callRequestStore.setCallRequestAsStarted(callRequest).then((e) => {
+        setCallRequest(e);
+        countdownRef.current?.reset();
+        countdownRef.current?.resume();
+      });
+    },
+    [callRequest, callRequestStore]
+  );
+
+  const onParticipantDisconnected = useCallback(
+    (_participant: ParticipantType) => {
+      setRemoteParticipant(undefined);
+
+      if (!callRequest) return;
+      callRequestStore.setCallRequestAsPaused(callRequest).then(() => {
+        countdownRef.current?.pause();
+      });
+    },
+    [callRequest, callRequestStore]
+  );
+
+  const onEndCallButtonClick = useCallback(() => {
+    setRoom((currentRoom) => {
+      if (!currentRoom || currentRoom.localParticipant.state !== "connected")
+        return;
+      currentRoom.localParticipant.tracks.forEach((trackPublication) => {
+        if (trackPublication.track instanceof LocalDataTrack) return;
+        trackPublication.track.stop();
+      });
+      currentRoom.disconnect();
+      return undefined;
+    });
+  }, []);
 
   useEffect(() => {
-    if (!callRequest) return;
+    if (!params.id) return;
 
-    callRequestStore.createTwilioToken().then((token) => {
+    callRequestStore.fetchCallRequest(params.id).then((callRequest) => {
+      setCallRequest(callRequest);
+    });
+  }, [callRequestStore, params.id]);
+
+  useEffect(() => {
+    if (!callRequest || room !== undefined) return;
+
+    callRequestStore.createTwilioToken(callRequest).then((token) => {
       Video.connect(token, { name: callRequest.slug }).then((room) => {
         setRoom(room);
         setLocalParticipant(room.localParticipant);
@@ -57,19 +102,13 @@ const CallRequestSessionScreen: React.FC<CallRequestSessionScreenPropsType> = (
         room.participants.forEach(onParticipantConnected);
       });
     });
-
-    return () => {
-      setRoom((room) => {
-        if (!room || room.localParticipant.state !== "connected") return room;
-        room.localParticipant.tracks.forEach((trackPublication) => {
-          if (trackPublication.track instanceof LocalDataTrack) return;
-          trackPublication.track.stop();
-        });
-        room.disconnect();
-        return null;
-      });
-    };
-  }, [callRequestStore, callRequest]);
+  }, [
+    onParticipantConnected,
+    onParticipantDisconnected,
+    callRequestStore,
+    callRequest,
+    room,
+  ]);
 
   return (
     <StyledContainer>
@@ -90,6 +129,8 @@ const CallRequestSessionScreen: React.FC<CallRequestSessionScreenPropsType> = (
       <LocalParticipant
         participant={localParticipant}
         callRequest={callRequest}
+        countdownRef={countdownRef}
+        onEndCallButtonClick={onEndCallButtonClick}
       />
     </StyledContainer>
   );

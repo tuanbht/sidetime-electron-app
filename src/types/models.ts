@@ -76,7 +76,8 @@ export type CallRequestType = {
     | "scheduled"
     | "completed"
     | "declined"
-    | "canceled";
+    | "canceled"
+    | "paused";
   updated_at: string;
   videoconference: boolean;
   my_role: "requester" | "expert";

@@ -28,12 +28,11 @@ export type CallRequestTwilioTokenType = {
 
 export type StorePublicInterface = {
   fetchCallRequests: () => Promise<CallRequestType[]>;
-  fetchCallRequest?: (id: number) => Promise<CallRequestType>;
+  fetchCallRequest: (id: string) => Promise<CallRequestType>;
   updateCallRequest: (
     callRequest: CallRequestType,
     params: UpdateCallRequestType
   ) => Promise<CallRequestType>;
-  setCallRequest: (callRequest: CallRequestType | undefined) => void;
   setCallRequestAsAccepted: (
     callRequest: CallRequestType,
     scheduled_at: string
@@ -45,6 +44,12 @@ export type StorePublicInterface = {
   ) => Promise<void>;
   setCallRequestAsFinished: (callRequest: CallRequestType) => Promise<void>;
   setCallRequestAsRefunded: (callRequest: CallRequestType) => Promise<void>;
+  setCallRequestAsStarted: (
+    callRequest: CallRequestType
+  ) => Promise<CallRequestType>;
+  setCallRequestAsPaused: (
+    callRequest: CallRequestType
+  ) => Promise<CallRequestType>;
   createTwilioToken: (callRequest?: CallRequestType) => Promise<string>;
   bounceCallRequest: (
     callRequest: CallRequestType,
