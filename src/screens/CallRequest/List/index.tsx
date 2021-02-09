@@ -179,17 +179,19 @@ const CallRequestListScreen: React.FC<CallRequestListScreenPropsType> = () => {
   }, [callRequests]);
 
   const historyTab = useMemo(() => {
-    const declined =
-      callRequests?.filter(({ status }) => status === CALL_REQUEST_DECLINED) ||
-      [];
-    const canceled =
-      callRequests?.filter(({ status }) => status === CALL_REQUEST_CANCELED) ||
-      [];
+    const calls = (
+      callRequests?.filter(({ status }) =>
+        [CALL_REQUEST_DECLINED, CALL_REQUEST_CANCELED].includes(status)
+      ) || []
+    )
+      .sort(
+        (e, i) =>
+          new Date(e.scheduled_at || e.proposed_times[0]).getTime() -
+          new Date(i.scheduled_at || i.proposed_times[0]).getTime()
+      )
+      .reverse();
 
-    return [
-      ...[declined.length > 0 ? renderTabSection("DECLINED", declined) : null],
-      ...[canceled.length > 0 ? renderTabSection("CANCELED", canceled) : null],
-    ];
+    return calls.map((e) => <CallRequestListItem callRequest={e} key={e.id} />);
   }, [callRequests]);
 
   return (
