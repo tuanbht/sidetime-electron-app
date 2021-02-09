@@ -49,7 +49,7 @@ export type StorePublicInterface = {
   bounceCallRequest: (
     callRequest: CallRequestType,
     params: BounceCallRequestType
-  ) => Promise<void>;
+  ) => Promise<CallRequestType>;
 };
 
 export type CallRequestStoreType = StoreProperties & StorePublicInterface;

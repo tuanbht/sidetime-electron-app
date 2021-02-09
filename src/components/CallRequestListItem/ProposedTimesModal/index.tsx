@@ -32,6 +32,7 @@ import {
 
 const ProposedTimesModal: React.FC<ProposedTimesModalPropsType> = ({
   callRequest,
+  readOnly = false,
 }) => {
   const [selectedTime, setSelectedTime] = useState<string>();
   const { callRequestStore, notificationStore, authStore } = useAppContext();
@@ -44,7 +45,7 @@ const ProposedTimesModal: React.FC<ProposedTimesModalPropsType> = ({
       .then(() => {
         const message = `Call with ${renderCallPartnerName()} scheduled for ${dayjs(
           selectedTime
-        ).format("dddd MMM DD YYYY HH:mm A")} `;
+        ).format("dddd MMM DD YYYY hh:mm A")} `;
 
         modalContext.close();
         notificationStore.setSuccessNotification(message);
@@ -65,15 +66,26 @@ const ProposedTimesModal: React.FC<ProposedTimesModalPropsType> = ({
     return getCallPartnerNameBasedOnPerspective(callRequest, currentUser);
   };
 
+  const renderBodyMessage = () => {
+    const name = renderCallPartnerName();
+    const message = `${
+      readOnly ? "You" : name
+    } would like to schedule a video call with ${readOnly ? name : "you"}`;
+
+    return message;
+  };
+
   const renderProposedTimes = () => {
     const { proposed_times } = callRequest;
 
     return proposed_times.map((proposedTime) => (
       <ProposedTimeContainer>
-        <ProposedTimeRadioButton
-          type="radio"
-          onClick={() => setSelectedTime(proposedTime)}
-        />
+        {!readOnly ? (
+          <ProposedTimeRadioButton
+            type="radio"
+            onClick={() => setSelectedTime(proposedTime)}
+          />
+        ) : null}
         <CalendarIcon timestamp={proposedTime} />
         <ProposedHourContainer>
           <Typography
@@ -109,12 +121,16 @@ const ProposedTimesModal: React.FC<ProposedTimesModalPropsType> = ({
       <ModalBodyContainer>
         <Typography
           variant="regular"
-          text={`${renderCallPartnerName()} would like to schedule a video call with you`}
+          text={renderBodyMessage()}
           css={bodyTextTypographyStyles}
         />
         <Typography
           variant="regular"
-          text={`Select a time that suits you most or proposed a new time.`}
+          text={
+            readOnly
+              ? "Check the proposed times bellow."
+              : "Select a time that suits you most or proposed a new time."
+          }
           css={bodyTextTypographyStyles}
         />
         <Typography
@@ -123,30 +139,33 @@ const ProposedTimesModal: React.FC<ProposedTimesModalPropsType> = ({
           css={bodyTextTypographyStyles}
         />
         <ProposedTimesContainer>{renderProposedTimes()}</ProposedTimesContainer>
-
-        <HorizontalDivider />
       </ModalBodyContainer>
-      <ModalFooterContainer>
+      {!readOnly ? (
         <>
-          <Button
-            text="GO BACK"
-            onClick={() => modalContext.close()}
-            buttonTextCss={goBackButtonTextStyles}
-            css={goBackButtonStyles}
-          />
+          <HorizontalDivider />
+          <ModalFooterContainer>
+            <>
+              <Button
+                text="GO BACK"
+                onClick={() => modalContext.close()}
+                buttonTextCss={goBackButtonTextStyles}
+                css={goBackButtonStyles}
+              />
+            </>
+            <Button
+              text="DECLINE ALL"
+              onClick={onDeclineButtonClick}
+              css={declineButtonStyles}
+            />
+            <Button
+              disabled={!selectedTime}
+              text="ACCEPT SELECTED"
+              onClick={onAcceptButtonClick}
+              css={acceptButtonStyles}
+            />
+          </ModalFooterContainer>
         </>
-        <Button
-          text="DECLINE ALL"
-          onClick={onDeclineButtonClick}
-          css={declineButtonStyles}
-        />
-        <Button
-          disabled={!selectedTime}
-          text="ACCEPT SELECTED"
-          onClick={onAcceptButtonClick}
-          css={acceptButtonStyles}
-        />
-      </ModalFooterContainer>
+      ) : null}
     </StyledContainer>
   );
 };

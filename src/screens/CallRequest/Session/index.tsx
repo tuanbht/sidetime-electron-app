@@ -38,7 +38,6 @@ const CallRequestSessionScreen: React.FC<CallRequestSessionScreenPropsType> = (
   } = useAppContext();
 
   const onParticipantConnected = (participant: RemoteParticipantType) => {
-    console.log('REMOTE PARTICIPANT: ' + participant.sid);
     setRemoteParticipant(participant);
   };
 
@@ -53,8 +52,6 @@ const CallRequestSessionScreen: React.FC<CallRequestSessionScreenPropsType> = (
       Video.connect(token, { name: callRequest.slug }).then((room) => {
         setRoom(room);
         setLocalParticipant(room.localParticipant);
-        console.log('LOCAL PARTICIPANT: ' + room.localParticipant.sid);
-        console.log('ROOM: ' + room.sid);
         room.on("participantConnected", onParticipantConnected);
         room.on("participantDisconnected", onParticipantDisconnected);
         room.participants.forEach(onParticipantConnected);

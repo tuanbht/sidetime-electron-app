@@ -134,13 +134,13 @@ class CallRequestStore implements CallRequestStoreType {
   public bounceCallRequest = (
     callRequest: CallRequestType,
     params: BounceCallRequestType
-  ): Promise<void> => {
+  ): Promise<CallRequestType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
         .bounce(callRequest.id, params)
         .then((callRequest) => {
           this.findAndUpdateCallRequests(callRequest);
-          resolve();
+          resolve(callRequest);
         })
         .catch((err) => reject(err));
     });

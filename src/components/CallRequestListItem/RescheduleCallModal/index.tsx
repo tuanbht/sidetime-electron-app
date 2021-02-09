@@ -28,11 +28,19 @@ import useModalContext from "../../../hooks/useModalContext";
 import Input from "../../Input";
 import TimerPicker from "../../TimePicker";
 import dayjs from "dayjs";
+import {
+  getCallPartnerNameBasedOnPerspective,
+  isExpertPerspective,
+} from "../../../utils/callrequest";
 
 const RescheduleCallModal: React.FC<RescheduleCallModalPropsType> = ({
   callRequest,
 }) => {
-  const { callRequestStore, notificationStore, authStore } = useAppContext();
+  const {
+    callRequestStore: { bounceCallRequest, updateCallRequest },
+    notificationStore,
+    authStore,
+  } = useAppContext();
   const modalContext = useModalContext();
 
   const form = useFormik({
@@ -42,11 +50,14 @@ const RescheduleCallModal: React.FC<RescheduleCallModalPropsType> = ({
     validationSchema: schema,
     onSubmit: (values) => {
       form.setSubmitting(true);
-      callRequestStore
-        .updateCallRequest(callRequest, {
-          ...values,
-          reply_user_id: authStore.currentUser?.id || "",
-        })
+      const action = isExpertPerspective(callRequest, authStore.currentUser)
+        ? bounceCallRequest
+        : updateCallRequest;
+
+      action(callRequest, {
+        ...values,
+        reply_user_id: authStore.currentUser?.id || "",
+      })
         .then(() => {
           notificationStore.setSuccessNotification(
             "Call rescheduling request sent."
@@ -109,12 +120,19 @@ const RescheduleCallModal: React.FC<RescheduleCallModalPropsType> = ({
     return <TimerPicker onAddTime={onNewTimeAdded} />;
   };
 
+  const renderCallPartnerName = () => {
+    const { currentUser } = authStore;
+
+    if (!currentUser) return "";
+    return getCallPartnerNameBasedOnPerspective(callRequest, currentUser);
+  };
+
   return (
     <StyledContainer>
       <ModalHeaderContainer>
         <Typography
           variant="medium"
-          text="Reschedule the call"
+          text="Propose new times"
           css={modalHeaderTypographyStyles}
         />
         <Button
@@ -127,7 +145,7 @@ const RescheduleCallModal: React.FC<RescheduleCallModalPropsType> = ({
       <ModalBodyContainer>
         <Typography
           variant="regular"
-          text={`Propose up to five times that suit you and let ${callRequest.expert.name} confirm one.`}
+          text={`Propose up to five times that suit you and let ${renderCallPartnerName()} confirm one.`}
           css={bodyTextTypographyStyles}
         />
         {form.values.proposed_times.length ? (

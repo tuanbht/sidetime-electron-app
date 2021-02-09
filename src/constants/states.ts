@@ -9,3 +9,4 @@ export const CALL_REQUEST_SCHEDULED = "scheduled";
 export const CALL_REQUEST_COMPLETED = "completed";
 export const CALL_REQUEST_CANCELED = "canceled";
 export const CALL_REQUEST_DECLINED = "declined";
+export const CALL_REQUEST_PAUSED = "paused";

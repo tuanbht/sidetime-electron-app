@@ -121,8 +121,10 @@ const CallRequestListScreen: React.FC<CallRequestListScreenPropsType> = () => {
     );
     const pending = callRequests?.filter(
       (callRequest) =>
-        callRequest.status === CALL_REQUEST_PENDING_EXPERT &&
-        isRequesterPerspective(callRequest, currentUser)
+        (callRequest.status === CALL_REQUEST_PENDING_EXPERT &&
+          isRequesterPerspective(callRequest, currentUser)) ||
+        (callRequest.status === CALL_REQUEST_PENDING_REQUESTER &&
+          isExpertPerspective(callRequest, currentUser))
     );
     const awaiting = callRequests?.filter(
       (callRequest) =>
@@ -189,7 +191,6 @@ const CallRequestListScreen: React.FC<CallRequestListScreenPropsType> = () => {
         {renderTabLabel("upcomming", "Upcomming Calls")}
         {renderTabLabel("completed", "Completed Calls")}
         {renderTabLabel("history", "Call History Log")}
-        <button onClick={() => callRequestStore.fetchCallRequests() }>REFRESH</button>
       </TabsContainer>
       <TabContainer>
         {tab === "upcomming" ? upcommingTab : null}
