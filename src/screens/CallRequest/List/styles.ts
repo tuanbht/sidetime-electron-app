@@ -1,4 +1,6 @@
 import styled, { css } from "styled-components";
+import { ButtonStyleType } from "../../../types/components/Button";
+import theme from "../../../constants/theme";
 
 export const StyledContainer = styled.div`
   padding: 35px 40px 135px 70px;
@@ -12,6 +14,8 @@ export const WelcomeContainer = styled.div`
   align-items: center;
 `;
 export const TabsContainer = styled.div`
+  display: flex;
+  align-itens: center;
   margin-top: 32px;
 `;
 
@@ -96,3 +100,16 @@ export const actionMenuStyles = css`
   right: 0px;
   top: 60px;
 `;
+
+export const refreshButtonStyles = css<ButtonStyleType>`
+  background-color: ${({ theme: { palette } }): string => palette.grey10};
+  &:hover {
+    background-color: ${({ theme: { palette } }): string => palette.grey10};
+  }
+  height: 16px;
+  line-height: 16px;
+`;
+
+export const refreshIconStyles: React.CSSProperties = {
+  color: theme.palette.blueGrey,
+};

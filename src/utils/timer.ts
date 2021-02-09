@@ -1,17 +1,26 @@
 import { CallRequestType } from "../types/models";
 import { TimerType } from "../types/components/Countdown";
 
+export type Trigger = {
+  seconds?: number;
+  minutes?: number;
+  repeat?: boolean;
+};
+
 export class Timer {
   id: number;
-  callback: () => void;
   start: number;
   remaining: number;
+  trigger: Trigger;
+  callback: () => void;
 
-  constructor(callback: () => void, remaining: number) {
+  constructor(callback: () => void, trigger: Trigger) {
+    this.executeCallBack = this.executeCallBack.bind(this);
     this.callback = callback;
-    this.remaining = remaining;
+    this.trigger = trigger;
+    this.remaining = this.calcMiliseconds();
     this.start = Date.now();
-    this.id = window.setTimeout(callback, remaining);
+    this.id = window.setTimeout(this.executeCallBack, this.remaining);
   }
 
   pause() {
@@ -22,7 +31,27 @@ export class Timer {
   resume() {
     this.start = Date.now();
     window.clearTimeout(this.id);
-    this.id = window.setTimeout(this.callback, this.remaining);
+    this.id = window.setTimeout(this.executeCallBack, this.remaining);
+  }
+
+  clear() {
+    window.clearTimeout(this.id);
+  }
+
+  executeCallBack() {
+    this.callback();
+    if (this.trigger.repeat) {
+      this.resume();
+    }
+  }
+
+  calcMiliseconds() {
+    let miliseconds = 0;
+
+    miliseconds += this.trigger.seconds ? this.trigger.seconds * 1000 : 0;
+    miliseconds += this.trigger.minutes ? this.trigger.minutes * 60000 : 0;
+
+    return miliseconds;
   }
 }
 

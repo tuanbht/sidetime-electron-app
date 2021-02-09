@@ -16,6 +16,9 @@ export const ButtonContainer = styled.button<ButtonStyleType>`
     },
     disabled,
   }): string => (disabled ? redDisabled : orangish)};
+  &:focus {
+    outline: none;
+  }
   &:hover {
     background-color: ${({
       theme: {
@@ -24,10 +27,8 @@ export const ButtonContainer = styled.button<ButtonStyleType>`
       disabled,
     }): string => (disabled ? redDisabled : orangishHovering)};
   }
-  &:active {
-    background-color: ${({ theme: { palette } }) => palette.orangishActive};
-  }
   ${(props: ButtonStyleType): CSSProp => props.css || ""}
+  cursor: pointer;
 `;
 
 export const buttonTextTypographyStyles = css`
