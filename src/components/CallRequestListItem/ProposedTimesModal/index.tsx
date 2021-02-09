@@ -83,6 +83,7 @@ const ProposedTimesModal: React.FC<ProposedTimesModalPropsType> = ({
         {!readOnly ? (
           <ProposedTimeRadioButton
             type="radio"
+            checked={selectedTime === proposedTime}
             onClick={() => setSelectedTime(proposedTime)}
           />
         ) : null}

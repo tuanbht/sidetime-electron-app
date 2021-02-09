@@ -69,8 +69,8 @@ const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
     call_type,
     scheduled_at,
     duration_in_mins,
-    price_cents,
     proposed_times,
+    total_cost_cents,
   } = callRequest;
 
   const getCallRequestTimestamp = () => {
@@ -197,7 +197,7 @@ const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
           <PriceContainer>
             <Typography
               variant="bold"
-              text={`$${((duration_in_mins * price_cents) / 100).toFixed(2)}`}
+              text={`$${(total_cost_cents / 100).toFixed(2)}`}
               css={callBillingTypographStyles}
             />
             <Typography

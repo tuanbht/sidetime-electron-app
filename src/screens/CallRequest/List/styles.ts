@@ -27,7 +27,9 @@ export const RightActionsMenuContainer = styled.div`
   right: 40px;
   background-color: ${({ theme: { palette } }) => palette.grey100};
 `;
-export const TabContainer = styled.div``;
+export const TabContainer = styled.div`
+  padding-bottom: 50px;
+`;
 export const RightActionsMenu = styled.div``;
 export const RightActionsMenuItem = styled.div``;
 

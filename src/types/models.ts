@@ -60,6 +60,11 @@ export type CallRequestType = {
   missed_call_request_id: number | null;
   premium_fee_cents: number;
   price_cents: number;
+  total_cost_cents: number;
+  discount: {
+    code: string;
+    percentage_points: number;
+  };
   proposed_times: string[];
   scheduled_at: string;
   site: SiteType;
