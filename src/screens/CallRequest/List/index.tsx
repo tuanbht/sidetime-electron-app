@@ -173,9 +173,14 @@ const CallRequestListScreen: React.FC<CallRequestListScreenPropsType> = () => {
   }, [callRequests, currentUser]);
 
   const completedTab = useMemo(() => {
-    const completed = callRequests?.filter(
-      ({ status }) => status === CALL_REQUEST_COMPLETED
-    );
+    const completed = callRequests
+      ?.filter(({ status }) => status === CALL_REQUEST_COMPLETED)
+      .sort(
+        (e, i) =>
+          new Date(e.scheduled_at).getTime() -
+          new Date(i.scheduled_at).getTime()
+      )
+      .reverse();
 
     return [...renderTabSection("COMPLETED", completed, NO_COMPLETED_CALLS)];
   }, [callRequests]);
