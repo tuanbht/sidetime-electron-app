@@ -31,7 +31,7 @@ export const getCallPartnerNameBasedOnPerspective = (
   if (!currentUser) return "";
 
   if (isRequesterPerspective(callRequest, currentUser)) {
-    return `expert ${callRequest.expert.name}`;
+    return `${callRequest.expert.name}(expert)`;
   }
 
   return callRequest.requester.name;
