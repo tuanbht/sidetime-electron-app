@@ -61,15 +61,13 @@ export const createTimersForCallRequest = (
 ): TimerType[] => {
   if (!callRequest) return [];
 
-  const { duration_in_mins } = callRequest;
-  const fiveMinLeftTimer = 300; // +300s = 5 min left
+  const callEndTimer = 0; // 0 seconds left
   const tenMinsOvertimeTimer = -600; // -600s = 10 min overtime
   const twentyMinsOvertimeTimer = -1200; // -1200s = 20 min overtime
-  const closeCallTimer = -1230; // -1230 = 20 min and 30s overtime
+  const closeCallTimer = -1210; // -1230 = 20 min and 10s overtime
 
-  const onFiveMinutesLeft = () => {
-    if (duration_in_mins <= 5) return;
-    new Audio(process.env.REACT_APP_FIVE_MIN_WARNING).play();
+  const onCallEnd = () => {
+    new Audio(process.env.REACT_APP_CALL_END_WARNING).play();
   };
   const on10MinsOvertime = () => {
     return new Audio(process.env.REACT_APP_TEN_MIN_WARNING).play();
@@ -78,7 +76,7 @@ export const createTimersForCallRequest = (
     new Audio(process.env.REACT_APP_TWENTY_MIN_WARNING).play();
 
   return [
-    { timeInSeconds: fiveMinLeftTimer, onExpire: onFiveMinutesLeft },
+    { timeInSeconds: callEndTimer, onExpire: onCallEnd },
     { timeInSeconds: tenMinsOvertimeTimer, onExpire: on10MinsOvertime },
     { timeInSeconds: twentyMinsOvertimeTimer, onExpire: on20MinsOvertime },
     { timeInSeconds: closeCallTimer, onExpire: onClosingCallTimerExpired },

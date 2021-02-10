@@ -5,7 +5,7 @@ import RemoteParticipant from "./RemoteParticipant";
 import useAppContext from "../../../hooks/useAppContext";
 import logo from "../../../assets/logo.png";
 import { CallRequestType } from "../../../types/models";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import {
   CallRequestSessionScreenPropsType,
   CallRequestSessionScreenRouteParams,
@@ -36,11 +36,11 @@ const CallRequestSessionScreen: React.FC<CallRequestSessionScreenPropsType> = (
     remoteParticipant,
     setRemoteParticipant,
   ] = useState<RemoteParticipantType>();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [room, setRoom] = useState<Room>();
   const [callRequest, setCallRequest] = useState<CallRequestType>();
   const countdownRef = useRef<CountdownInterface>(null);
   const params = useParams<CallRequestSessionScreenRouteParams>();
+  const history = useHistory();
   const { callRequestStore } = useAppContext();
 
   const onParticipantConnected = useCallback(
@@ -69,18 +69,26 @@ const CallRequestSessionScreen: React.FC<CallRequestSessionScreenPropsType> = (
     [callRequest, callRequestStore]
   );
 
-  const onEndCallButtonClick = useCallback(() => {
-    setRoom((currentRoom) => {
-      if (!currentRoom || currentRoom.localParticipant.state !== "connected")
-        return;
-      currentRoom.localParticipant.tracks.forEach((trackPublication) => {
-        if (trackPublication.track instanceof LocalDataTrack) return;
-        trackPublication.track.stop();
-      });
-      currentRoom.disconnect();
-      return undefined;
+  const unpublishTracksAndDisconnect = useCallback(() => {
+    if (!room) return;
+
+    const {
+      localParticipant: { state, tracks },
+    } = room;
+    if (state !== "connected") return;
+
+    tracks.forEach((publication) => {
+      if (publication.track instanceof LocalDataTrack) return;
+      publication.track.stop();
     });
-  }, []);
+
+    room.disconnect();
+  }, [room]);
+
+  const onEndCallButtonClick = useCallback(() => {
+    unpublishTracksAndDisconnect();
+    history.push("/call_requests");
+  }, [history, unpublishTracksAndDisconnect]);
 
   useEffect(() => {
     if (!params.id) return;
@@ -130,6 +138,7 @@ const CallRequestSessionScreen: React.FC<CallRequestSessionScreenPropsType> = (
         participant={localParticipant}
         callRequest={callRequest}
         countdownRef={countdownRef}
+        onCallEnded={onEndCallButtonClick}
         onEndCallButtonClick={onEndCallButtonClick}
       />
     </StyledContainer>
