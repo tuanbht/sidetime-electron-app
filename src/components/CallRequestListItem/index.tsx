@@ -34,9 +34,15 @@ import {
   callTypeTypographStyles,
   callBillingTypographStyles,
   minutesRemainingTypographStyles,
+  declinedCanceledLabelTypographyStyles,
   labelTypographStyles,
 } from "./styles";
-import { CALL_REQUEST_LIVE, CALL_REQUEST_PAUSED } from "../../constants/states";
+import {
+  CALL_REQUEST_CANCELED,
+  CALL_REQUEST_DECLINED,
+  CALL_REQUEST_LIVE,
+  CALL_REQUEST_PAUSED,
+} from "../../constants/states";
 import {
   DECLINE_CALL_BUTTON,
   VIEW_CALL_PROPOSED_TIMES_BUTTON,
@@ -46,7 +52,10 @@ import {
   MARK_CALL_FINISHED_BUTTON,
   JOIN_CALL_BUTTON,
 } from "./ActionButtons";
-import { getCallPartnerNameBasedOnPerspective } from "../../utils/callrequest";
+import {
+  getCallPartnerNameBasedOnPerspective,
+  getFormmatedCallRequestStatus,
+} from "../../utils/callrequest";
 
 const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
   callRequest,
@@ -155,6 +164,15 @@ const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
                   variant="bold"
                   text="Live"
                   css={liveLabelTypographyStyles}
+                />
+              ) : null}
+              {[CALL_REQUEST_DECLINED, CALL_REQUEST_CANCELED].includes(
+                status
+              ) ? (
+                <Typography
+                  variant="bold"
+                  text={getFormmatedCallRequestStatus(callRequest)}
+                  css={declinedCanceledLabelTypographyStyles}
                 />
               ) : null}
             </CallNameContainer>

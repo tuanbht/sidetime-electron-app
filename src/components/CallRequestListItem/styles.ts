@@ -72,6 +72,18 @@ export const liveLabelTypographyStyles = css`
   background-color: ${({ theme: { palette } }): string => palette.orangish};
 `;
 
+export const declinedCanceledLabelTypographyStyles = css`
+  font-size: 14px;
+  line-height: 25px;
+  width: 85px;
+  height: 25px;
+  margin-left: 10px;
+  border-radius: 25px;
+  text-align: center;
+  color: ${({ theme: { palette } }): string => palette.grey100};
+  background-color: ${({ theme: { palette } }): string => palette.grey10};
+`;
+
 export const callNameTypographyStyles = css`
   font-size: 20px;
   line-height: 20px;

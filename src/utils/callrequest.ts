@@ -24,6 +24,11 @@ export const getCallPerspective = (
   return "";
 };
 
+export const getFormmatedCallRequestStatus = (callRequest: CallRequestType) => {
+  const { status } = callRequest;
+  return status.charAt(0).toUpperCase() + status.slice(1);
+};
+
 export const getCallPartnerNameBasedOnPerspective = (
   callRequest: CallRequestType,
   currentUser: null | undefined | UserType
