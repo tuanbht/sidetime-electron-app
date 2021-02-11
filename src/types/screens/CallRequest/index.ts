@@ -19,5 +19,6 @@ export type LocalParticipantPropsType = {
   participant: LocalParticipantType | undefined;
   callRequest: CallRequestType | undefined;
   countdownRef?: React.Ref<CountdownInterface>;
+  onCallEnded?: () => void;
   onEndCallButtonClick?: () => void;
 };

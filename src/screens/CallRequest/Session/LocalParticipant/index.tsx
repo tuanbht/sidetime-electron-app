@@ -10,7 +10,6 @@ import { StrongTypedMap } from "../../../../types/map";
 import { LocalParticipantPropsType } from "../../../../types/screens/CallRequest";
 import { ReactComponent as MessageCircleOff } from "../../../../assets/comments-off.svg";
 import { ReactComponent as MonitorOff } from "../../../../assets/screenshare-off.svg";
-import { useHistory } from "react-router-dom";
 import { DesktopCapturerSource } from "electron";
 import { LocalVideoTrack, LocalAudioTrack } from "twilio-video";
 import {
@@ -71,6 +70,7 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
     participant,
     callRequest,
     countdownRef,
+    onCallEnded,
     onEndCallButtonClick,
   } = props;
 
@@ -87,7 +87,6 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
-  const history = useHistory();
 
   const icons: ActionButtonMap = {
     mic: { on: Mic, off: MicOff },
@@ -102,10 +101,6 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
     if (duration_in_mins === undefined || minutes_used === undefined) return 0;
 
     return (duration_in_mins - minutes_used) * 60;
-  };
-
-  const onClosingCallTimerExpired = () => {
-    history.push("/call_requests");
   };
 
   const onScreenSelect = async (source: DesktopCapturerSource) => {
@@ -264,14 +259,16 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
         <BottomContainer>
           <LeftContainer>
             <CounterContainer>
-              <Countdown
-                ref={countdownRef}
-                countdownInSeconds={callDurantionInSecondsLeft()}
-                timers={createTimersForCallRequest(
-                  callRequest,
-                  onClosingCallTimerExpired
-                )}
-              />
+              {callRequest ? (
+                <Countdown
+                  ref={countdownRef}
+                  countdownInSeconds={callDurantionInSecondsLeft()}
+                  timers={createTimersForCallRequest(
+                    callRequest,
+                    onCallEnded || (() => {})
+                  )}
+                />
+              ) : null}
               <Typography
                 variant="bold"
                 text="Minutes remaining"
@@ -279,10 +276,7 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
               />
               <Button
                 text="END CALL"
-                onClick={() => {
-                  history.push("/call_requests");
-                  if (onEndCallButtonClick) onEndCallButtonClick();
-                }}
+                onClick={onEndCallButtonClick || (() => {})}
                 css={endCallButtonStyles}
               />
             </CounterContainer>
