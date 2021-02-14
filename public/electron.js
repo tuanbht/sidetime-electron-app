@@ -42,8 +42,9 @@ const createWindow = () => {
   mainWindow.setMenu(null);
 
   if (isDev) {
+    mainWindow.setPosition(0, 0);
     mainWindow.loadURL("http://localhost:3000");
-    mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools({ mode: "bottom" });
   } else {
     mainWindow.loadURL(
       url.format({

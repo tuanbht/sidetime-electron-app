@@ -1,7 +1,7 @@
 import styled, { keyframes } from "styled-components";
 // @ts-ignore
 import { fadeIn } from "react-animations";
-const slideInDownAnimation = keyframes`${fadeIn}`;
+const fadeInAnimation = keyframes`${fadeIn}`;
 
 export const StyledContainer = styled.div`
   display: flex;
@@ -13,5 +13,5 @@ export const StyledContainer = styled.div`
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  animation: 0.5s ${slideInDownAnimation};
+  animation: 0.5s ${fadeInAnimation};
 `;

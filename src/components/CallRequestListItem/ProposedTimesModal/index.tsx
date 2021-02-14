@@ -84,6 +84,7 @@ const ProposedTimesModal: React.FC<ProposedTimesModalPropsType> = ({
           <ProposedTimeRadioButton
             type="radio"
             checked={selectedTime === proposedTime}
+            onChange={() => {}}
             onClick={() => setSelectedTime(proposedTime)}
           />
         ) : null}

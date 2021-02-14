@@ -31,6 +31,7 @@ export const StyledInput = styled.input<InputStylePropsType>`
     borderColorResolver(isFocused, hasError, palette)};
   margin-top: 8px;
   padding-left: 8px;
+  ${(props: InputStylePropsType): CSSProp => props.css || ""}
 `;
 
 export const StyledTextArea = styled.textarea<InputStylePropsType>`
@@ -42,6 +43,7 @@ export const StyledTextArea = styled.textarea<InputStylePropsType>`
   margin-top: 8px;
   padding: 8px 8px;
   resize: none;
+  ${(props: InputStylePropsType): CSSProp => props.css || ""}
 `;
 
 export const StyledSelect = styled.select<InputStylePropsType>`

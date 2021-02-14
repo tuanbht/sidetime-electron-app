@@ -1,9 +1,10 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import dayjs from "dayjs";
 import Typography from "../Typography";
 import VerticalDivider from "../VerticalDivider";
 import HorizontalDivider from "../HorizontalDivider";
 import CalendarIcon from "../CalendarIcon";
+import CommentListItem from "../CommentListItem";
 import Modal, { ModalInterface } from "../Modal";
 import MarkAsCompleteModal from "./MarkAsCompleteModal";
 import RescheduleCallModal from "./RescheduleCallModal";
@@ -11,7 +12,10 @@ import ProposedTimesModal from "./ProposedTimesModal";
 import DeclineCallModal from "./DeclineCallModal";
 import CancelCallModal from "./CancelCallModal";
 import RefundCallModal from "./RefundCallModal";
+import CommentsList from "../Comments/List";
+import CommentsCreate from "../Comments/Create";
 import useAppContext from "../../hooks/useAppContext";
+import { formatCallRequestMessageAsComment } from "../../utils/comments";
 import { CallRequestListItemPropsType } from "../../types/components/CallRequestListItem";
 import { useHistory } from "react-router-dom";
 import { Video, Phone } from "react-feather";
@@ -36,9 +40,11 @@ import {
   minutesRemainingTypographStyles,
   declinedCanceledLabelTypographyStyles,
   labelTypographStyles,
+  messagesTypographyStyles,
 } from "./styles";
 import {
   CALL_REQUEST_CANCELED,
+  CALL_REQUEST_COMPLETED,
   CALL_REQUEST_DECLINED,
   CALL_REQUEST_LIVE,
   CALL_REQUEST_PAUSED,
@@ -51,6 +57,8 @@ import {
   RESCHEDULE_CALL_BUTTON,
   MARK_CALL_FINISHED_BUTTON,
   JOIN_CALL_BUTTON,
+  SHOW_CALL_COMMENTS_BUTTON,
+  HIDE_CALL_COMMENTS_BUTTON,
 } from "./ActionButtons";
 import {
   getCallPartnerNameBasedOnPerspective,
@@ -67,6 +75,7 @@ const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
   const declineCallRef = useRef<ModalInterface>(null);
   const cancellCallRef = useRef<ModalInterface>(null);
   const refundCallRef = useRef<ModalInterface>(null);
+  const [isShowingComments, setisShowingComments] = useState<boolean>(false);
 
   const history = useHistory();
   const {
@@ -82,6 +91,8 @@ const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
     proposed_times,
     total_cost_cents,
     minutes_used,
+    message,
+    messaging_enabled,
   } = callRequest;
 
   const getCallRequestTimestamp = () => {
@@ -113,9 +124,21 @@ const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
     const onCancelButtonClick = () => cancellCallRef.current?.open();
     const onRescheduleButtonClick = () => rescheduleCallRef.current?.open();
     const onFinishButtonClick = () => markAsCompleteModalRef.current?.open();
+    const onShowCommentsButtonClick = () => {
+      setisShowingComments(true);
+    };
+    const onHideCommentsButtonClick = () => {
+      setisShowingComments(false);
+    };
     const onJoinCallButtonClick = () => history.push(`/call_requests/${id}`);
 
     actions = [
+      isShowingComments
+        ? [HIDE_CALL_COMMENTS_BUTTON, onHideCommentsButtonClick]
+        : null,
+      !isShowingComments
+        ? [SHOW_CALL_COMMENTS_BUTTON, onShowCommentsButtonClick]
+        : null,
       [DECLINE_CALL_BUTTON, onDeclineButtonClick],
       [VIEW_CALL_PROPOSED_TIMES_BUTTON, onAcceptProposedTimesButtonClick],
       [CHECK_CALL_PROPOSED_TIMES_BUTTON, onCheckProposedTimesButtonClick],
@@ -123,8 +146,9 @@ const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
       [RESCHEDULE_CALL_BUTTON, onRescheduleButtonClick],
       [MARK_CALL_FINISHED_BUTTON, onFinishButtonClick],
       [JOIN_CALL_BUTTON, onJoinCallButtonClick],
-    ].map((e) => {
-      const [button, onClick] = e;
+    ].map((action) => {
+      if (!action) return null;
+      const [button, onClick] = action;
       // @ts-ignore
       return button.validate(callRequest, currentUser)
         ? // @ts-ignore
@@ -166,9 +190,11 @@ const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
                   css={liveLabelTypographyStyles}
                 />
               ) : null}
-              {[CALL_REQUEST_DECLINED, CALL_REQUEST_CANCELED].includes(
-                status
-              ) ? (
+              {[
+                CALL_REQUEST_DECLINED,
+                CALL_REQUEST_CANCELED,
+                CALL_REQUEST_COMPLETED,
+              ].includes(status) ? (
                 <Typography
                   variant="bold"
                   text={getFormmatedCallRequestStatus(callRequest)}
@@ -181,6 +207,13 @@ const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
               text={call_type}
               css={callTypeTypographStyles}
             />
+            {!isShowingComments && (
+              <CommentListItem
+                side="left"
+                callRequest={callRequest}
+                comment={formatCallRequestMessageAsComment(message)}
+              />
+            )}
           </ExpertContainer>
           <TimeContainer>
             <Typography
@@ -196,6 +229,24 @@ const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
           </TimeContainer>
         </InfoContainer>
         <HorizontalDivider />
+        {isShowingComments && (
+          <>
+            <Typography
+              variant="bold"
+              text="MESSAGES"
+              css={messagesTypographyStyles}
+            />{" "}
+            <CommentsList callRequest={callRequest}>
+              <HorizontalDivider />
+              {messaging_enabled && (
+                <>
+                  <CommentsCreate callRequest={callRequest} />
+                  <HorizontalDivider />
+                </>
+              )}
+            </CommentsList>
+          </>
+        )}
         <BillingContainer>
           <DurationContainer>
             <Typography

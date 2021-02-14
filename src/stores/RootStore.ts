@@ -2,11 +2,13 @@ import AuthStore from "./AuthStore";
 import CallRequestStore from "./CallRequestStore";
 import NotificationStore from "./NotificationStore";
 import DeeplinkStore from "./DeeplinkStore";
+import CallRequestCommentsStore from "./CallRequestCommentsStore";
 import { create } from "mobx-persist";
 import { observable, makeObservable, runInAction } from "mobx";
 import { AuthStoreType } from "../types/stores/AuthStore";
 import { CallRequestStoreType } from "../types/stores/CallRequestStore";
 import { NotificationStoreType } from "../types/stores/NotificationStore";
+import { CallRequestCommentsStoreType } from "../types/stores/CallRequestCommentsStore";
 import { RootStoreType } from "../types/stores/RootStore";
 
 const resume = create({
@@ -17,6 +19,7 @@ const resume = create({
 class RootStore implements RootStoreType {
   public readonly authStore: AuthStoreType;
   public readonly callRequestStore: CallRequestStoreType;
+  public readonly callRequestCommentsStore: CallRequestCommentsStoreType;
   public readonly notificationStore: NotificationStoreType;
   public readonly deeplinkStore: DeeplinkStore;
   public isLoading: boolean;
@@ -24,7 +27,7 @@ class RootStore implements RootStoreType {
   constructor() {
     this.authStore = new AuthStore(this);
     this.callRequestStore = new CallRequestStore(this);
-    this.notificationStore = new NotificationStore(this);
+    this.callRequestCommentsStore = new CallRequestCommentsStore(this);
     this.notificationStore = new NotificationStore(this);
     this.deeplinkStore = new DeeplinkStore(this);
 

@@ -188,7 +188,11 @@ const CallRequestListScreen: React.FC<CallRequestListScreenPropsType> = () => {
   const historyTab = useMemo(() => {
     const calls = (
       callRequests?.filter(({ status }) =>
-        [CALL_REQUEST_DECLINED, CALL_REQUEST_CANCELED].includes(status)
+        [
+          CALL_REQUEST_DECLINED,
+          CALL_REQUEST_CANCELED,
+          CALL_REQUEST_COMPLETED,
+        ].includes(status)
       ) || []
     )
       .sort(
@@ -222,7 +226,7 @@ const CallRequestListScreen: React.FC<CallRequestListScreenPropsType> = () => {
       </WelcomeContainer>
       <TabsContainer>
         {renderTabLabel("upcoming", "Upcoming Calls")}
-        {renderTabLabel("completed", "Completed Calls")}
+        {/* {renderTabLabel("completed", "Completed Calls")} */}
         {renderTabLabel("history", "Call History Log")}
         <Button
           css={refreshButtonStyles}

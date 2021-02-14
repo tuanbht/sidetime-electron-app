@@ -121,6 +121,12 @@ export const labelTypographStyles = css`
   color: ${({ theme: { palette } }): string => palette.blueGrey};
 `;
 
+export const messagesTypographyStyles = css`
+  font-size: 12px;
+  line-height: 12px;
+  color: ${({ theme: { palette } }): string => palette.slateGrey};
+`;
+
 export const callIconStyles: React.CSSProperties = {
   marginRight: "6px",
   color: theme.palette.slateGrey,

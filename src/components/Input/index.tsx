@@ -33,6 +33,7 @@ const Input: ForwardRefRenderFunction<InputInterface, InputPropsType> = (
     editable = true,
     secureText = false,
     css,
+    inputCss,
     numRows,
     onChange,
     onFocus,
@@ -52,6 +53,10 @@ const Input: ForwardRefRenderFunction<InputInterface, InputPropsType> = (
   useEffect(() => {
     setInnerError(error);
   }, [error]);
+
+  useEffect(() => {
+    setInnerValue(value);
+  }, [value]);
 
   useImperativeHandle(ref, () => {
     return { setError };
@@ -78,6 +83,7 @@ const Input: ForwardRefRenderFunction<InputInterface, InputPropsType> = (
     hasError: !!innerError,
     isFocused: isFocused,
     ref: refInput,
+    css: inputCss,
   };
 
   const renderInput = () => {

@@ -36,11 +36,23 @@ export type SiteType = {
 export type ExpertType = {
   id: number;
   name: string;
+  avatar_url: string;
 };
 
 export type RequesterType = {
   id: number;
   name: string;
+  avatar_url: string;
+};
+
+export type MessageType = {
+  user_id: number;
+  body: string;
+  created_at: string;
+};
+
+export type CommentType = MessageType & {
+  id: number;
 };
 
 export type CallRequestType = {
@@ -50,12 +62,14 @@ export type CallRequestType = {
   call_type: string;
   calls_count: number;
   charges_count: number;
+  comments: CommentType[];
   comments_count: number;
   created_at: string;
   credit_cents: number;
   duration_in_mins: number;
   extra_time_in_mins: number;
-  message: string;
+  messaging_enabled: boolean;
+  message: MessageType;
   minutes_used: number;
   missed_call_request_id: number | null;
   premium_fee_cents: number;

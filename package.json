@@ -1,6 +1,6 @@
 {
   "name": "sidetime_app",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "main": "public/electron.js",
   "homepage": "./",
@@ -114,6 +114,9 @@
         "NSMicrophoneUsageDescription": "We need access to your microphone so people you talk to in a Sidetime call can hear you.",
         "NSCameraUsageDescription": "We need access to your camera so people you talk to in a Sidetime call can see you."
       }
+    },
+    "win": {
+      "icon": "build/logo192_4x.png"
     },
     "files": [
       "build/**/*",

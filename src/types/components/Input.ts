@@ -27,4 +27,5 @@ export type InputPropsType = InputStyleType & {
   error?: string;
   numRows?: number;
   children?: any;
+  inputCss?: CSSProp;
 };

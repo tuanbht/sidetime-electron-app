@@ -8,6 +8,7 @@ import {
 } from "react-feather";
 import { v4 as uuidv4 } from "uuid";
 import { ReactComponent as Refund } from "../../../assets/refund.svg";
+import { ReactComponent as MessageCircleOff } from "../../../assets/comments-off-grey.svg";
 import { CallRequestType, UserType } from "../../../types/models";
 import {
   isExpertPerspective,
@@ -142,11 +143,23 @@ export const JOIN_CALL_BUTTON = {
     callRequest.videoconference,
 };
 
-export const COMMENTS_CALL_BUTTON = {
+export const SHOW_CALL_COMMENTS_BUTTON = {
   render: (onClick: () => void) => (
     <Button
       key={uuidv4()}
       icon={<MessageCircle size={16} style={actionIconStyles} />}
+      onClick={onClick}
+      css={actionButtonStyles}
+    />
+  ),
+  validate: (_callRequest: CallRequestType, _currentUser: UserType) => true,
+};
+
+export const HIDE_CALL_COMMENTS_BUTTON = {
+  render: (onClick: () => void) => (
+    <Button
+      key={uuidv4()}
+      icon={<MessageCircleOff style={actionIconStyles} />}
       onClick={onClick}
       css={actionButtonStyles}
     />
@@ -176,6 +189,7 @@ export const ACTION_BUTTONS = {
   RESCHEDULE_CALL_BUTTON,
   MARK_CALL_FINISHED_BUTTON,
   JOIN_CALL_BUTTON,
-  COMMENTS_CALL_BUTTON,
+  SHOW_CALL_COMMENTS_BUTTON,
+  HIDE_CALL_COMMENTS_BUTTON,
   REFUND_CALL_BUTTON,
 };
