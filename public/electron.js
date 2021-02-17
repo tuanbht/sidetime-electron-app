@@ -54,6 +54,7 @@ const createWindow = () => {
       })
     );
   }
+  app.setAsDefaultProtocolClient("sidetime");
   mainWindow.on("closed", () => (mainWindow = null));
 
   const deepLink = openedURL || process.argv[1];

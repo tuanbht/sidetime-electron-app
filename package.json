@@ -1,8 +1,9 @@
 {
   "name": "sidetime_app",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "main": "public/electron.js",
+  "description": "Get expert advice from experienced professionals",
   "homepage": "./",
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.4",
@@ -107,7 +108,7 @@
     "productName": "Sidetime",
     "copyright": "Copyright © 2021 ${author}",
     "mac": {
-      "icon": "build/logo192_4x.png",
+      "icon": "build/logo.png",
       "category": "public.app-category.utilities",
       "entitlements": "entitlements.mac.plist",
       "extendInfo": {
@@ -116,7 +117,8 @@
       }
     },
     "win": {
-      "icon": "build/logo192_4x.png"
+      "icon": "build/logo.ico",
+      "certificateSha1": "C57D4D78C09A781C2115BF7A1C6EACE2BC506E4A"
     },
     "files": [
       "build/**/*",
