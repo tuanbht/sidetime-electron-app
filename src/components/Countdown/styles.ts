@@ -6,3 +6,10 @@ export const countDownTypographyStyles = css`
   font-family: ${({ theme: { fonts } }) => fonts.neuzeitGrotesk};
   color: ${({ theme: { palette } }) => palette.white};
 `;
+
+export const minutesRemaningTypographyStyles = css`
+  font-size: 12px;
+  line-height: 12px;
+  font-family: ${({ theme: { fonts } }) => fonts.neuzeitGrotesk};
+  color: ${({ theme: { palette } }) => palette.white};
+`;

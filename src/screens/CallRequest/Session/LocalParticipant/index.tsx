@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import cameraPlaceholder from "../../../../assets/camera.png";
 import Button from "../../../../components/Button";
-import Typography from "../../../../components/Typography";
 import Countdown from "../../../../components/Countdown";
 import HorizontalDivider from "../../../../components/HorizontalDivider";
 import window from "../../../../utils/window";
@@ -38,7 +37,6 @@ import {
   Screen,
   CameraPlaceholder,
   Camera,
-  minutesRemaningTypographyStyles,
   endCallButtonStyles,
   onActionButtonStyles,
   onActionIconStyles,
@@ -269,11 +267,6 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
                   )}
                 />
               ) : null}
-              <Typography
-                variant="bold"
-                text="Minutes remaining"
-                css={minutesRemaningTypographyStyles}
-              />
               <Button
                 text="END CALL"
                 onClick={onEndCallButtonClick || (() => {})}

@@ -8,7 +8,10 @@ import React, {
 } from "react";
 import Typography from "../Typography";
 import { CountdownPropsType } from "../../types/components/Countdown";
-import { countDownTypographyStyles } from "./styles";
+import {
+  countDownTypographyStyles,
+  minutesRemaningTypographyStyles,
+} from "./styles";
 
 export interface CountdownInterface {
   resume: () => void;
@@ -46,7 +49,6 @@ const Countdown: ForwardRefRenderFunction<
     const secondsLeft = absSeconds - minutesLeft * 60;
 
     return [
-      seconds < 0 ? "+ " : "",
       String(minutesLeft).padStart(2, "0"),
       ":",
       String(secondsLeft).padStart(2, "0"),
@@ -91,11 +93,18 @@ const Countdown: ForwardRefRenderFunction<
   }, [doCountdown, isPaused]);
 
   return (
-    <Typography
-      variant="bold"
-      text={countdown()}
-      css={countDownTypographyStyles || css}
-    />
+    <>
+      <Typography
+        variant="bold"
+        text={countdown()}
+        css={countDownTypographyStyles || css}
+      />
+      <Typography
+        variant="bold"
+        text={seconds >= 0 ? "Minutes remaining" : "Over scheduled time"}
+        css={minutesRemaningTypographyStyles}
+      />
+    </>
   );
 };
 

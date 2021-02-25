@@ -92,13 +92,6 @@ export const CommentInputContainer = styled.div`
   height: 150px;
 `;
 
-export const minutesRemaningTypographyStyles = css`
-  font-size: 12px;
-  line-height: 12px;
-  font-family: ${({ theme: { fonts } }) => fonts.neuzeitGrotesk};
-  color: ${({ theme: { palette } }) => palette.white};
-`;
-
 export const endCallButtonStyles = css`
   width: 130px;
   height: 35px;
