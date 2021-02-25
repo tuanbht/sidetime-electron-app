@@ -29,6 +29,7 @@ import {
   ProposedTimeRadioButton,
   ProposedHourContainer,
 } from "./styles";
+import { getScheduledCallRequestMessage } from "../../../utils/notifications";
 
 const ProposedTimesModal: React.FC<ProposedTimesModalPropsType> = ({
   callRequest,
@@ -43,9 +44,12 @@ const ProposedTimesModal: React.FC<ProposedTimesModalPropsType> = ({
     callRequestStore
       .setCallRequestAsAccepted(callRequest, selectedTime)
       .then(() => {
-        const message = `Call with ${renderCallPartnerName()} scheduled for ${dayjs(
+        const { currentUser } = authStore;
+        const message = getScheduledCallRequestMessage(
+          callRequest,
+          currentUser,
           selectedTime
-        ).format("dddd MMM DD YYYY hh:mm A")} `;
+        );
 
         modalContext.close();
         notificationStore.setSuccessNotification(message);

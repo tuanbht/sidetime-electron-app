@@ -2,7 +2,7 @@ import { css } from "styled-components";
 import { ButtonStyleType } from "../../../types/components/Button";
 import theme from "../../../constants/theme";
 
-export const joinCallButtonStyles = css<ButtonStyleType>`
+export const greenButtonStyles = css<ButtonStyleType>`
   background-color: ${({ theme: { palette } }): string => palette.green};
   padding: 0px 16px;
   &:hover {
@@ -73,7 +73,7 @@ export const declineIconStyles: React.CSSProperties = {
   marginRight: "10px",
 };
 
-export const joinCallIconStyles: React.CSSProperties = {
+export const greenButtonIconStyles: React.CSSProperties = {
   marginRight: "10px",
   color: theme.palette.white,
 };

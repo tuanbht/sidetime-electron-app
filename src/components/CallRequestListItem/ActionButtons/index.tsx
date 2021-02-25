@@ -24,14 +24,14 @@ import {
 import {
   actionIconStyles,
   actionButtonStyles,
-  joinCallIconStyles,
+  greenButtonIconStyles,
   deleteButtonStyles,
   declineButtonStyles,
   deleteIconStyles,
   declineIconStyles,
   proposedTimesButtonStyles,
   declineButtonTextStyles,
-  joinCallButtonStyles,
+  greenButtonStyles,
 } from "./styles";
 
 export const DECLINE_CALL_BUTTON = {
@@ -62,10 +62,31 @@ export const VIEW_CALL_PROPOSED_TIMES_BUTTON = {
     />
   ),
   validate: (callRequest: CallRequestType, currentUser: UserType) =>
-    (callRequest.status === CALL_REQUEST_PENDING_REQUESTER &&
+    callRequest.proposed_times.length > 1 &&
+    ((callRequest.status === CALL_REQUEST_PENDING_REQUESTER &&
       isRequesterPerspective(callRequest, currentUser)) ||
-    (callRequest.status === CALL_REQUEST_PENDING_EXPERT &&
-      isExpertPerspective(callRequest, currentUser)),
+      (callRequest.status === CALL_REQUEST_PENDING_EXPERT &&
+        isExpertPerspective(callRequest, currentUser))),
+};
+
+export const ACCEPT_PROPOSED_TIME_BUTTON = {
+  render: (onClick: () => void, isLoading: boolean) => (
+    <Button
+      isLoading={isLoading}
+      disabled={isLoading}
+      key={uuidv4()}
+      icon={<Check size={16} style={greenButtonIconStyles} />}
+      text={"ACCEPT"}
+      onClick={onClick}
+      css={greenButtonStyles}
+    />
+  ),
+  validate: (callRequest: CallRequestType, currentUser: UserType) =>
+    callRequest.proposed_times.length <= 1 &&
+    ((callRequest.status === CALL_REQUEST_PENDING_REQUESTER &&
+      isRequesterPerspective(callRequest, currentUser)) ||
+      (callRequest.status === CALL_REQUEST_PENDING_EXPERT &&
+        isExpertPerspective(callRequest, currentUser))),
 };
 
 export const CHECK_CALL_PROPOSED_TIMES_BUTTON = {
@@ -131,10 +152,10 @@ export const JOIN_CALL_BUTTON = {
   render: (onClick: () => void) => (
     <Button
       key={uuidv4()}
-      icon={<PhoneCall size={16} style={joinCallIconStyles} />}
+      icon={<PhoneCall size={16} style={greenButtonIconStyles} />}
       text={"JOIN CALL"}
       onClick={onClick}
-      css={joinCallButtonStyles}
+      css={greenButtonStyles}
     />
   ),
   validate: (callRequest: CallRequestType, _currentUser: UserType) =>

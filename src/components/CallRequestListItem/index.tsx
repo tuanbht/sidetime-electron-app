@@ -15,10 +15,37 @@ import RefundCallModal from "./RefundCallModal";
 import CommentsList from "../Comments/List";
 import CommentsCreate from "../Comments/Create";
 import useAppContext from "../../hooks/useAppContext";
+import { useFormik } from "formik";
 import { formatCallRequestMessageAsComment } from "../../utils/comments";
 import { CallRequestListItemPropsType } from "../../types/components/CallRequestListItem";
 import { useHistory } from "react-router-dom";
 import { Video, Phone } from "react-feather";
+import { getScheduledCallRequestMessage } from "../../utils/notifications";
+import {
+  CALL_REQUEST_CANCELED,
+  CALL_REQUEST_COMPLETED,
+  CALL_REQUEST_DECLINED,
+  CALL_REQUEST_LIVE,
+  CALL_REQUEST_PAUSED,
+} from "../../constants/states";
+import {
+  DECLINE_CALL_BUTTON,
+  VIEW_CALL_PROPOSED_TIMES_BUTTON,
+  CHECK_CALL_PROPOSED_TIMES_BUTTON,
+  CANCEL_CALL_BUTTON,
+  RESCHEDULE_CALL_BUTTON,
+  MARK_CALL_FINISHED_BUTTON,
+  JOIN_CALL_BUTTON,
+  SHOW_CALL_COMMENTS_BUTTON,
+  HIDE_CALL_COMMENTS_BUTTON,
+  ACCEPT_PROPOSED_TIME_BUTTON,
+} from "./ActionButtons";
+import {
+  getCallPartnerNameBasedOnPerspective,
+  getFormmatedCallRequestStatus,
+  isCallRequestPending,
+  isMultiProposedCallRequest,
+} from "../../utils/callrequest";
 import {
   LeftContainer,
   RightContainer,
@@ -42,43 +69,23 @@ import {
   labelTypographStyles,
   messagesTypographyStyles,
 } from "./styles";
-import {
-  CALL_REQUEST_CANCELED,
-  CALL_REQUEST_COMPLETED,
-  CALL_REQUEST_DECLINED,
-  CALL_REQUEST_LIVE,
-  CALL_REQUEST_PAUSED,
-} from "../../constants/states";
-import {
-  DECLINE_CALL_BUTTON,
-  VIEW_CALL_PROPOSED_TIMES_BUTTON,
-  CHECK_CALL_PROPOSED_TIMES_BUTTON,
-  CANCEL_CALL_BUTTON,
-  RESCHEDULE_CALL_BUTTON,
-  MARK_CALL_FINISHED_BUTTON,
-  JOIN_CALL_BUTTON,
-  SHOW_CALL_COMMENTS_BUTTON,
-  HIDE_CALL_COMMENTS_BUTTON,
-} from "./ActionButtons";
-import {
-  getCallPartnerNameBasedOnPerspective,
-  getFormmatedCallRequestStatus,
-} from "../../utils/callrequest";
 
 const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
   callRequest,
 }) => {
   const markAsCompleteModalRef = useRef<ModalInterface>(null);
   const rescheduleCallRef = useRef<ModalInterface>(null);
-  const acceptProposedTimesRef = useRef<ModalInterface>(null);
-  const checkProposedTimesRef = useRef<ModalInterface>(null);
+  const acceptTimesRef = useRef<ModalInterface>(null);
+  const checkTimesRef = useRef<ModalInterface>(null);
   const declineCallRef = useRef<ModalInterface>(null);
   const cancellCallRef = useRef<ModalInterface>(null);
   const refundCallRef = useRef<ModalInterface>(null);
-  const [isShowingComments, setisShowingComments] = useState<boolean>(false);
+  const [isShowingComments, toogleComments] = useState<boolean>(false);
 
   const history = useHistory();
   const {
+    notificationStore,
+    callRequestStore,
     authStore: { currentUser },
   } = useAppContext();
   const {
@@ -95,19 +102,42 @@ const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
     messaging_enabled,
   } = callRequest;
 
+  const acceptTimeForm = useFormik({
+    initialValues: {},
+    onSubmit: () => {
+      acceptTimeForm.setSubmitting(true);
+      callRequestStore
+        .setCallRequestAsAccepted(callRequest, proposed_times[0])
+        .then(() => {
+          const message = getScheduledCallRequestMessage(
+            callRequest,
+            currentUser
+          );
+          notificationStore.setSuccessNotification(message);
+        })
+        .finally(() => acceptTimeForm.setSubmitting(false));
+    },
+  });
+
   const getCallRequestTimestamp = () => {
     if (scheduled_at) return scheduled_at;
     return proposed_times[0];
   };
 
   const getCallRequestTime = () => {
-    if (!scheduled_at) return "TBC";
+    if (
+      isCallRequestPending(callRequest) &&
+      isMultiProposedCallRequest(callRequest)
+    )
+      return "TBC";
+
     const timestamp = getCallRequestTimestamp();
     return dayjs(timestamp).format("hh:mmA");
   };
 
   const getCallTimezone = () => {
-    if (!scheduled_at) return "MULTIPLE TIMES PROPOSED";
+    if (!scheduled_at && proposed_times.length > 1)
+      return "MULTIPLE TIMES PROPOSED";
     return currentUser?.timezone || "";
   };
 
@@ -117,20 +147,17 @@ const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
     if (!currentUser) return actions;
 
     const onDeclineButtonClick = () => declineCallRef.current?.open();
-    const onAcceptProposedTimesButtonClick = () =>
-      acceptProposedTimesRef.current?.open();
-    const onCheckProposedTimesButtonClick = () =>
-      checkProposedTimesRef.current?.open();
+    const onAcceptTimesButtonClick = () => acceptTimesRef.current?.open();
+    const onCheckTimesButtonClick = () => checkTimesRef.current?.open();
     const onCancelButtonClick = () => cancellCallRef.current?.open();
     const onRescheduleButtonClick = () => rescheduleCallRef.current?.open();
     const onFinishButtonClick = () => markAsCompleteModalRef.current?.open();
-    const onShowCommentsButtonClick = () => {
-      setisShowingComments(true);
-    };
-    const onHideCommentsButtonClick = () => {
-      setisShowingComments(false);
-    };
+    const onShowCommentsButtonClick = () => toogleComments(true);
+    const onHideCommentsButtonClick = () => toogleComments(false);
     const onJoinCallButtonClick = () => history.push(`/call_requests/${id}`);
+    const onAcceptTimeButtonClick = () => {
+      acceptTimeForm.handleSubmit();
+    };
 
     actions = [
       isShowingComments
@@ -140,8 +167,9 @@ const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
         ? [SHOW_CALL_COMMENTS_BUTTON, onShowCommentsButtonClick]
         : null,
       [DECLINE_CALL_BUTTON, onDeclineButtonClick],
-      [VIEW_CALL_PROPOSED_TIMES_BUTTON, onAcceptProposedTimesButtonClick],
-      [CHECK_CALL_PROPOSED_TIMES_BUTTON, onCheckProposedTimesButtonClick],
+      [VIEW_CALL_PROPOSED_TIMES_BUTTON, onAcceptTimesButtonClick],
+      [ACCEPT_PROPOSED_TIME_BUTTON, onAcceptTimeButtonClick],
+      [CHECK_CALL_PROPOSED_TIMES_BUTTON, onCheckTimesButtonClick],
       [CANCEL_CALL_BUTTON, onCancelButtonClick],
       [RESCHEDULE_CALL_BUTTON, onRescheduleButtonClick],
       [MARK_CALL_FINISHED_BUTTON, onFinishButtonClick],
@@ -152,7 +180,7 @@ const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
       // @ts-ignore
       return button.validate(callRequest, currentUser)
         ? // @ts-ignore
-          button.render(onClick)
+          button.render(onClick, acceptTimeForm.isSubmitting)
         : null;
     });
 
@@ -296,10 +324,10 @@ const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
       <Modal ref={rescheduleCallRef}>
         <RescheduleCallModal callRequest={callRequest} />
       </Modal>
-      <Modal ref={acceptProposedTimesRef}>
+      <Modal ref={acceptTimesRef}>
         <ProposedTimesModal callRequest={callRequest} />
       </Modal>
-      <Modal ref={checkProposedTimesRef}>
+      <Modal ref={checkTimesRef}>
         <ProposedTimesModal callRequest={callRequest} readOnly />
       </Modal>
       <Modal ref={declineCallRef}>
