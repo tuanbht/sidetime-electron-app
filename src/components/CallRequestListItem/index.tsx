@@ -226,6 +226,11 @@ const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
               text={getCallTimezone()}
               css={labelTypographStyles}
             />
+            <Typography
+              variant="bold"
+              text={dayjs(getCallRequestTimestamp()).format("MMM D, YYYY")}
+              css={labelTypographStyles}
+            />
           </TimeContainer>
         </InfoContainer>
         <HorizontalDivider />
