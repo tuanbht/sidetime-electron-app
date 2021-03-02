@@ -15,3 +15,11 @@ export const RemoteVideo = styled.video`
   height: 100%;
   width: 100%;
 `;
+
+export const RemoteWebCam = styled.video`
+  position: absolute;
+  z-index: 10;
+  top: 220px;
+  right: 30px;
+  height: 170px;
+`;

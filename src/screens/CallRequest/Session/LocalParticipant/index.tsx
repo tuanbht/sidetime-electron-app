@@ -115,7 +115,6 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
     if (!stream || stream.getTracks().length === 0) return;
     const track = new LocalVideoTrack(stream.getTracks()[0]);
 
-    if (cameraTrack) participant?.unpublishTrack(cameraTrack);
     participant?.publishTrack(track);
     setScreenTrack(track);
     setScreens([]);
@@ -169,14 +168,6 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
       if (screenTrack) {
         participant?.unpublishTrack(screenTrack);
         setScreenTrack(undefined);
-
-        if (!cameraTrack?.mediaStreamTrack) return;
-
-        const track = new LocalVideoTrack(cameraTrack.mediaStreamTrack);
-
-        participant?.unpublishTrack(cameraTrack);
-        participant?.publishTrack(track);
-        setCameraTrack(track);
       }
 
       setScreens([]);

@@ -8,7 +8,7 @@ import window from "./window";
 export const getDesktopCapturerSources = (): Promise<
   Electron.DesktopCapturerSource[]
 > => {
-  return window.desktopCapturer.getSources({ types: ["screen"] });
+  return window.desktopCapturer.getSources({ types: ["screen", "window"] });
 };
 
 export const createStreamFromDesktopCapturerSources = (

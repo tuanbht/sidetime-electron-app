@@ -6,13 +6,15 @@ import {
   RemoteVideoTrack,
   RemoteVideoTrackPublication,
 } from "twilio-video";
-import { StyledContainer, RemoteVideo } from "./styles";
+import { StyledContainer, RemoteVideo, RemoteWebCam } from "./styles";
 
 const RemoteParticipant: React.FC<RemoteParticipantPropsType> = (props) => {
   const { participant } = props;
   const [audioTrack, setAudioTrack] = useState<RemoteAudioTrack | null>();
   const [videoTrack, setVideoTrack] = useState<RemoteVideoTrack | null>();
+  const [screenTrack, setScreenTrack] = useState<RemoteVideoTrack | null>();
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
+  const remoteScreenRef = useRef<HTMLVideoElement>(null);
   const remoteAudioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
@@ -22,7 +24,14 @@ const RemoteParticipant: React.FC<RemoteParticipantPropsType> = (props) => {
       "trackSubscribed",
       (track: RemoteVideoTrack | RemoteAudioTrack) => {
         if (track.kind === "audio") setAudioTrack(track);
-        else if (track.kind === "video") setVideoTrack(track);
+        else if (track.kind === "video") {
+          setVideoTrack((current: RemoteVideoTrack | null | undefined) => {
+            if (current) {
+              setScreenTrack(track);
+              return current;
+            } else return track;
+          });
+        }
       }
     );
 
@@ -30,7 +39,16 @@ const RemoteParticipant: React.FC<RemoteParticipantPropsType> = (props) => {
       "trackUnsubscribed",
       (track: RemoteVideoTrack | RemoteAudioTrack) => {
         if (track.kind === "audio") setAudioTrack(undefined);
-        else if (track.kind === "video") setVideoTrack(undefined);
+        else if (track.kind === "video") {
+          setVideoTrack((current) => {
+            if (track.sid === current?.sid) return undefined;
+            return current;
+          });
+          setScreenTrack((current) => {
+            if (track.sid === current?.sid) return undefined;
+            return current;
+          });
+        }
       }
     );
 
@@ -75,13 +93,39 @@ const RemoteParticipant: React.FC<RemoteParticipantPropsType> = (props) => {
     return () => {
       videoTrack.detach();
     };
-  }, [videoTrack]);
+  }, [videoTrack, screenTrack]);
 
-  if (!videoTrack?.isEnabled) return null;
+  useEffect(() => {
+    if (!screenTrack) return;
+
+    // @ts-ignore
+    screenTrack.attach(remoteScreenRef.current);
+
+    return () => {
+      screenTrack.detach();
+    };
+  }, [screenTrack]);
+
+  const renderScreenShareView = () => {
+    if (!screenTrack) return null;
+    return <RemoteVideo ref={remoteScreenRef} autoPlay={true} />;
+  };
+
+  const renderWebCamView = () => {
+    if (!videoTrack || screenTrack) return null;
+    return <RemoteVideo ref={remoteVideoRef} autoPlay={true} />;
+  };
+
+  const renderScreenSharingWebCamView = () => {
+    if (!screenTrack || !videoTrack?.isEnabled) return null;
+    return <RemoteWebCam ref={remoteVideoRef} autoPlay={true} />;
+  };
+
   return (
     <StyledContainer>
-      {/* @ts-ignore */}
-      <RemoteVideo ref={remoteVideoRef} autoPlay={true} />
+      {renderScreenShareView()}
+      {renderWebCamView()}
+      {renderScreenSharingWebCamView()}
     </StyledContainer>
   );
 };
