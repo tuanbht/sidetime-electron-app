@@ -45,7 +45,7 @@ export const CenterActionsContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-self: center;
-  min-width: 310px;
+  min-width: 350px;
 `;
 
 export const RightContainer = styled.div`

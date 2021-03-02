@@ -1,4 +1,8 @@
 import { DesktopCapturerSource } from "electron";
+import {
+  CustomMediaTrackCapabitilies,
+  CustomMediaTrackSettings,
+} from "../types/screenshare";
 import window from "./window";
 
 export const getDesktopCapturerSources = (): Promise<
@@ -21,4 +25,16 @@ export const createStreamFromDesktopCapturerSources = (
   };
   // @ts-ignore
   return navigator.mediaDevices.getUserMedia(constraints);
+};
+
+export const getMediaStreamTrackCapabilities = (
+  track: MediaStreamTrack
+): CustomMediaTrackCapabitilies => {
+  return track.getCapabilities();
+};
+
+export const getMediaStreamTrackSettings = (
+  track: MediaStreamTrack
+): CustomMediaTrackSettings => {
+  return track.getSettings();
 };

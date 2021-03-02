@@ -22,3 +22,7 @@ export type LocalParticipantPropsType = {
   onCallEnded?: () => void;
   onEndCallButtonClick?: () => void;
 };
+
+export type CallSettingsPropsType = {
+  webcamMediaStreamTrack: MediaStreamTrack;
+};

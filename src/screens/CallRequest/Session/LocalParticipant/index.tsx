@@ -11,6 +11,7 @@ import { ReactComponent as MessageCircleOff } from "../../../../assets/comments-
 import { ReactComponent as MonitorOff } from "../../../../assets/screenshare-off.svg";
 import { DesktopCapturerSource } from "electron";
 import { LocalVideoTrack, LocalAudioTrack } from "twilio-video";
+import { createTimersForCallRequest } from "../../../../utils/timer";
 import {
   Mic,
   MicOff,
@@ -18,6 +19,8 @@ import {
   VideoOff,
   Monitor,
   MessageCircle,
+  Settings,
+  X,
   Icon as IconType,
 } from "react-feather";
 import {
@@ -43,7 +46,7 @@ import {
   offActionButtonStyles,
   offActionIconStyles,
 } from "./styles";
-import { createTimersForCallRequest } from "../../../../utils/timer";
+import CallSettings from "./CallSettings";
 
 interface ActionButtonState {
   on: IconType | string;
@@ -55,6 +58,7 @@ interface ActionButton {
   cam: ActionButtonState;
   screen: ActionButtonState;
   comments: ActionButtonState;
+  settings: ActionButtonState;
 }
 
 type ActionButtonMap = StrongTypedMap<
@@ -75,6 +79,7 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
   const [isMicEnabled, setIsMicEnabled] = useState<boolean>(false);
   const [isCamEnabled, setIsCamEnabled] = useState<boolean>(false);
   const [isSharing, setIsSharing] = useState<boolean>(false);
+  const [isSettingsEnabled, setIsSettingsEnabled] = useState<boolean>(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isShowingComments, setIsShowingComments] = useState<boolean>(false);
   const [screens, setScreens] = useState<DesktopCapturerSource[]>([]);
@@ -91,6 +96,7 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
     cam: { on: Video, off: VideoOff },
     screen: { on: Monitor, off: MonitorOff },
     comments: { on: MessageCircleOff, off: MessageCircle },
+    settings: { on: Settings, off: X },
   };
 
   const callDurantionInSecondsLeft = () => {
@@ -211,9 +217,9 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
     active: boolean,
     onClick: () => void
   ) => {
-    const Icon = active ? icons[icon].on : icons[icon].off;
-    const iconStyle = active ? onActionIconStyles : offActionIconStyles;
-    const buttonStyle = active ? onActionButtonStyles : offActionButtonStyles;
+    const Icon = active ? icons[icon].off : icons[icon].on;
+    const iconStyle = active ? offActionIconStyles : onActionIconStyles;
+    const buttonStyle = active ? offActionButtonStyles : onActionButtonStyles;
     return (
       <Button
         icon={<Icon size={40} style={iconStyle} />}
@@ -238,6 +244,15 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
           />
         ))}
       </ScreensContainer>
+    );
+  };
+
+  const renderSettings = () => {
+    if (!isSettingsEnabled) return null;
+    if (!cameraTrack || !cameraTrack.mediaStreamTrack) return null;
+
+    return (
+      <CallSettings webcamMediaStreamTrack={cameraTrack.mediaStreamTrack} />
     );
   };
 
@@ -276,6 +291,7 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
           </LeftContainer>
           <CenterContainer>
             {renderScreens()}
+            {renderSettings()}
             <CenterActionsContainer>
               {renderActionButton("mic", isMicEnabled, () =>
                 setIsMicEnabled(!isMicEnabled)
@@ -285,6 +301,9 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
               )}
               {renderActionButton("screen", isSharing, () =>
                 setIsSharing(!isSharing)
+              )}
+              {renderActionButton("settings", isSettingsEnabled, () =>
+                setIsSettingsEnabled(!isSettingsEnabled)
               )}
             </CenterActionsContainer>
           </CenterContainer>
