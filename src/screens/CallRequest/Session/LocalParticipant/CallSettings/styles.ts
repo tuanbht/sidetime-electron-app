@@ -13,6 +13,12 @@ export const ConstrastSliderContainer = styled.div`
   align-content: center;
 `;
 
+export const VirtualCableContainer = styled.div`
+  margin-top: 20px;
+`;
+
+export const InputDeviceOption = styled.option``;
+
 export const ContrastSlider = styled.input`
   -webkit-appearance: none;
   height: 5px;
@@ -35,10 +41,15 @@ export const settingsTypographyStyles = css`
   color: ${({ theme: { palette } }) => palette.slateGrey};
 `;
 
-export const contrastSliderInputLabelTypographyStyles = css`
+export const labelTypographyStyles = css`
   font-size: 16px;
   line-height: 16px;
   font-family: ${({ theme: { fonts } }) => fonts.neuzeitGrotesk};
   color: ${({ theme: { palette } }): string => palette.slateGrey};
   margin-top: 16px;
+`;
+
+export const detachButtonTypographyStyles = css`
+  height: 20px;
+  margin-left: auto;
 `;

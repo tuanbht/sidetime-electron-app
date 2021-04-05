@@ -3,6 +3,7 @@ import cameraPlaceholder from "../../../../assets/camera.png";
 import Button from "../../../../components/Button";
 import Countdown from "../../../../components/Countdown";
 import HorizontalDivider from "../../../../components/HorizontalDivider";
+import CallSettings from "./CallSettings";
 import window from "../../../../utils/window";
 import * as ScreenShare from "../../../../utils/screenshare";
 import { StrongTypedMap } from "../../../../types/map";
@@ -12,6 +13,7 @@ import { ReactComponent as MonitorOff } from "../../../../assets/screenshare-off
 import { DesktopCapturerSource } from "electron";
 import { LocalVideoTrack, LocalAudioTrack } from "twilio-video";
 import { createTimersForCallRequest } from "../../../../utils/timer";
+import { createStreamFromInputSource } from "../../../../utils/virtualCable";
 import {
   Mic,
   MicOff,
@@ -46,7 +48,6 @@ import {
   offActionButtonStyles,
   offActionIconStyles,
 } from "./styles";
-import CallSettings from "./CallSettings";
 
 interface ActionButtonState {
   on: IconType | string;
@@ -85,6 +86,7 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
   const [screens, setScreens] = useState<DesktopCapturerSource[]>([]);
 
   const [micTrack, setMicTrack] = useState<LocalAudioTrack>();
+  const [cableTrack, setCableTrack] = useState<LocalAudioTrack>();
   const [cameraTrack, setCameraTrack] = useState<LocalVideoTrack>();
   const [screenTrack, setScreenTrack] = useState<LocalVideoTrack>();
 
@@ -118,6 +120,22 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
     participant?.publishTrack(track);
     setScreenTrack(track);
     setScreens([]);
+  };
+
+  const onCableSelect = async (deviceId: String) => {
+    const stream = await createStreamFromInputSource(deviceId);
+
+    if (!stream || stream.getTracks().length === 0) return;
+    const track = new LocalAudioTrack(stream.getTracks()[0]);
+
+    participant?.publishTrack(track);
+    setCableTrack(track);
+  };
+
+  const onCableDetach = () => {
+    if (!cableTrack) return;
+    participant?.unpublishTrack(cableTrack);
+    setCableTrack(undefined);
   };
 
   useEffect(() => {
@@ -241,9 +259,15 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
   const renderSettings = () => {
     if (!isSettingsEnabled) return null;
     if (!cameraTrack || !cameraTrack.mediaStreamTrack) return null;
+    if (!micTrack || !micTrack.mediaStreamTrack) return null;
 
     return (
-      <CallSettings webcamMediaStreamTrack={cameraTrack.mediaStreamTrack} />
+      <CallSettings
+        webcamMediaStreamTrack={cameraTrack.mediaStreamTrack}
+        onVirtualCableSelect={onCableSelect}
+        onVirtualCableDetach={onCableDetach}
+        attachedDeviceLabel={cableTrack?.mediaStreamTrack.label}
+      />
     );
   };
 

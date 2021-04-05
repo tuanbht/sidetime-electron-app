@@ -25,4 +25,7 @@ export type LocalParticipantPropsType = {
 
 export type CallSettingsPropsType = {
   webcamMediaStreamTrack: MediaStreamTrack;
+  onVirtualCableSelect: (deviceId: string) => void;
+  onVirtualCableDetach: () => void;
+  attachedDeviceLabel: string | undefined;
 };

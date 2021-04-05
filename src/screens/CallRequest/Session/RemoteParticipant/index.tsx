@@ -11,11 +11,13 @@ import { StyledContainer, RemoteVideo, RemoteWebCam } from "./styles";
 const RemoteParticipant: React.FC<RemoteParticipantPropsType> = (props) => {
   const { participant } = props;
   const [audioTrack, setAudioTrack] = useState<RemoteAudioTrack | null>();
+  const [cableTrack, setCableTrack] = useState<RemoteAudioTrack | null>();
   const [videoTrack, setVideoTrack] = useState<RemoteVideoTrack | null>();
   const [screenTrack, setScreenTrack] = useState<RemoteVideoTrack | null>();
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const remoteScreenRef = useRef<HTMLVideoElement>(null);
   const remoteAudioRef = useRef<HTMLAudioElement>(null);
+  const remoteCableAudioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     if (!participant) return;
@@ -23,8 +25,14 @@ const RemoteParticipant: React.FC<RemoteParticipantPropsType> = (props) => {
     participant?.on(
       "trackSubscribed",
       (track: RemoteVideoTrack | RemoteAudioTrack) => {
-        if (track.kind === "audio") setAudioTrack(track);
-        else if (track.kind === "video") {
+        if (track.kind === "audio") {
+          setAudioTrack((current: RemoteAudioTrack | null | undefined) => {
+            if (current) {
+              setCableTrack(track);
+              return current;
+            } else return track;
+          });
+        } else if (track.kind === "video") {
           setVideoTrack((current: RemoteVideoTrack | null | undefined) => {
             if (current) {
               setScreenTrack(track);
@@ -37,18 +45,15 @@ const RemoteParticipant: React.FC<RemoteParticipantPropsType> = (props) => {
 
     participant?.on(
       "trackUnsubscribed",
-      (track: RemoteVideoTrack | RemoteAudioTrack) => {
-        if (track.kind === "audio") setAudioTrack(undefined);
-        else if (track.kind === "video") {
-          setVideoTrack((current) => {
-            if (track.sid === current?.sid) return undefined;
-            return current;
-          });
-          setScreenTrack((current) => {
-            if (track.sid === current?.sid) return undefined;
-            return current;
-          });
-        }
+      (track: RemoteAudioTrack | RemoteVideoTrack) => {
+        [setAudioTrack, setCableTrack, setVideoTrack, setScreenTrack].forEach(
+          (fun) => {
+            fun((current: any) => {
+              if (track.sid === current?.sid) return undefined;
+              return current;
+            });
+          }
+        );
       }
     );
 
@@ -105,6 +110,17 @@ const RemoteParticipant: React.FC<RemoteParticipantPropsType> = (props) => {
       screenTrack.detach();
     };
   }, [screenTrack]);
+
+  useEffect(() => {
+    if (!cableTrack) return;
+
+    // @ts-ignore
+    cableTrack.attach(remoteCableAudioRef.current);
+
+    return () => {
+      cableTrack.detach();
+    };
+  }, [cableTrack]);
 
   const renderScreenShareView = () => {
     if (!screenTrack) return null;

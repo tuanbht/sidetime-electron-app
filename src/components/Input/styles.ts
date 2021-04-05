@@ -32,6 +32,9 @@ export const StyledInput = styled.input<InputStylePropsType>`
   margin-top: 8px;
   padding-left: 8px;
   ${(props: InputStylePropsType): CSSProp => props.css || ""}
+  &:focus {
+    outline: none;
+  }
 `;
 
 export const StyledTextArea = styled.textarea<InputStylePropsType>`
@@ -44,6 +47,9 @@ export const StyledTextArea = styled.textarea<InputStylePropsType>`
   padding: 8px 8px;
   resize: none;
   ${(props: InputStylePropsType): CSSProp => props.css || ""}
+  &:focus {
+    outline: none;
+  }
 `;
 
 export const StyledSelect = styled.select<InputStylePropsType>`
@@ -55,6 +61,9 @@ export const StyledSelect = styled.select<InputStylePropsType>`
   margin-top: 8px;
   padding: 8px 8px;
   resize: none;
+  &:focus {
+    outline: none;
+  }
 `;
 
 export const StyledError = styled.big<InputStylePropsType>`
