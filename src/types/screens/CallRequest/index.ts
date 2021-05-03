@@ -29,3 +29,7 @@ export type CallSettingsPropsType = {
   onVirtualCableDetach: () => void;
   attachedDeviceLabel: string | undefined;
 };
+
+export type RequestScreenshareModalPropsType = {
+  onDone: () => void;
+};

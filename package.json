@@ -21,6 +21,7 @@
     "dayjs": "^1.10.3",
     "dotenv": "^8.2.0",
     "electron-is-dev": "^1.2.0",
+    "electron-util": "^0.15.0",
     "formik": "^2.2.6",
     "mobx": "^6.0.4",
     "mobx-persist": "^0.4.1",

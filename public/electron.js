@@ -5,6 +5,7 @@ const {
   systemPreferences,
   protocol,
 } = require("electron");
+const { openSystemPreferences } = require("electron-util");
 const path = require("path");
 const url = require("url");
 const isDev = require("electron-is-dev");
@@ -74,6 +75,14 @@ const createWindow = () => {
     }
 
     mainWindow.webContents.send("request-media-access-return", isGranted);
+  });
+
+  ipcMain.handle("is-screenshare-access-granted", () => {
+    return systemPreferences.getMediaAccessStatus("screen") === "granted";
+  });
+
+  ipcMain.on("open-screenshare-preferences", () => {
+    openSystemPreferences("security", "Privacy_ScreenCapture");
   });
 
   log("deeplink url: " + deepLink);

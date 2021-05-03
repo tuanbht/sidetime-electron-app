@@ -4,6 +4,8 @@ import Button from "../../../../components/Button";
 import Countdown from "../../../../components/Countdown";
 import HorizontalDivider from "../../../../components/HorizontalDivider";
 import CallSettings from "./CallSettings";
+import Modal, { ModalInterface } from "../../../../components/Modal";
+import RequestScreenshareModal from "./RequestScreenshareModal";
 import window from "../../../../utils/window";
 import * as ScreenShare from "../../../../utils/screenshare";
 import { StrongTypedMap } from "../../../../types/map";
@@ -92,6 +94,7 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const requestScreenModal = useRef<ModalInterface>(null);
 
   const icons: ActionButtonMap = {
     mic: { on: Mic, off: MicOff },
@@ -113,6 +116,20 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
     if (!screen.thumbnail?.isEmpty()) return screen.thumbnail?.toDataURL();
     if (!screen.appIcon?.isEmpty()) return screen.appIcon?.toDataURL();
     return "";
+  };
+
+  const onScreenshare = async () => {
+    if (window.platform === "darwin") {
+      const isGranted = await window.ipc.invoke(
+        "is-screenshare-access-granted"
+      );
+      if (!isGranted) {
+        requestScreenModal.current?.open();
+        return;
+      }
+    }
+
+    setIsSharing(!isSharing);
   };
 
   const onScreenSelect = async (source: DesktopCapturerSource) => {
@@ -320,9 +337,7 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
               {renderActionButton("cam", isCamEnabled, () =>
                 setIsCamEnabled(!isCamEnabled)
               )}
-              {renderActionButton("screen", isSharing, () =>
-                setIsSharing(!isSharing)
-              )}
+              {renderActionButton("screen", isSharing, onScreenshare)}
               {renderActionButton("settings", isSettingsEnabled, () =>
                 setIsSettingsEnabled(!isSettingsEnabled)
               )}
@@ -338,6 +353,9 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
       {isShowingComments ? (
         <CommentsContainer>{comments}</CommentsContainer>
       ) : null}
+      <Modal ref={requestScreenModal}>
+        <RequestScreenshareModal onDone={() => onScreenshare()} />
+      </Modal>
     </StyledContainer>
   );
 };
