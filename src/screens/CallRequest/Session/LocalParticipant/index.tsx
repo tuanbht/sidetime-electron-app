@@ -109,6 +109,12 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
     return (duration_in_mins - minutes_used) * 60;
   };
 
+  const getScreenThumbnail = (screen: DesktopCapturerSource): string => {
+    if (!screen.thumbnail?.isEmpty()) return screen.thumbnail?.toDataURL();
+    if (!screen.appIcon?.isEmpty()) return screen.appIcon?.toDataURL();
+    return "";
+  };
+
   const onScreenSelect = async (source: DesktopCapturerSource) => {
     const stream = await ScreenShare.createStreamFromDesktopCapturerSources(
       source
@@ -246,7 +252,7 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
         {screens.map((screen) => (
           <Screen
             key={screen.id}
-            src={screen.thumbnail.toDataURL()}
+            src={getScreenThumbnail(screen)}
             onClick={() => {
               onScreenSelect(screen);
             }}
