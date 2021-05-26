@@ -83,7 +83,7 @@ const ProposedTimesModal: React.FC<ProposedTimesModalPropsType> = ({
     const { proposed_times } = callRequest;
 
     return proposed_times.map((proposedTime) => (
-      <ProposedTimeContainer>
+      <ProposedTimeContainer key={proposedTime}>
         {!readOnly ? (
           <ProposedTimeRadioButton
             type="radio"

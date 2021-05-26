@@ -68,6 +68,7 @@ export type CallRequestType = {
   credit_cents: number;
   duration_in_mins: number;
   extra_time_in_mins: number;
+  from_bundle: boolean;
   messaging_enabled: boolean;
   message: MessageType;
   minutes_used: number;

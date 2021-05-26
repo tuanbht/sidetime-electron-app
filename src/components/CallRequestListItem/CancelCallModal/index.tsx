@@ -53,11 +53,13 @@ const CancelCallModal: React.FC<CancelCallModalPropsType> = ({
             authStore.currentUser
           );
           const message = `You have successfully cancelled the call with ${callPartner}`;
-
-          modalContext.close();
           notificationStore.setSuccessNotification(message);
         })
+        .catch((err) => {
+          notificationStore.setErrorNotification(err.data[0]);
+        })
         .finally(() => {
+          modalContext.close();
           form.setSubmitting(false);
         });
     },

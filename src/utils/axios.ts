@@ -15,13 +15,13 @@ const REQUEST_INTERCEPTORS = {
   },
 };
 
-const instance = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
-  timeout: 5000,
-});
-
 export const request = {
   api: () => {
+    const instance = axios.create({
+      baseURL: process.env.REACT_APP_API_URL,
+      timeout: 5000,
+    });
+
     instance.interceptors.request.use(REQUEST_INTERCEPTORS.auth);
     return instance;
   },

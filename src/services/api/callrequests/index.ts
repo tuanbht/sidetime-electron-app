@@ -52,7 +52,7 @@ const cancel = (id: number, params: any): Promise<CallRequestType> =>
       .api()
       .patch(`/api/v1/call_requests/${id}/cancel`, params)
       .then((res) => resolve(res.data))
-      .catch((res) => reject(res.response));
+      .catch((err) => reject(err.response));
   });
 
 const finish = (id: number): Promise<CallRequestType> =>
