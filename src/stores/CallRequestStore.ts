@@ -42,13 +42,19 @@ class CallRequestStore implements CallRequestStoreType {
           runInAction(() => (this.callRequests = callRequests));
           resolve(callRequests);
         })
-        .catch((err) => reject(err));
+        .catch((err) => {
+          runInAction(() => {
+            const authStore = this.rootStore?.authStore;
+            return authStore ? authStore.logout() : () => {};
+          });
+          reject(err);
+        });
     });
   };
 
   public updateCallRequest = (
     callRequest: CallRequestType,
-    params: UpdateCallRequestType
+    params: UpdateCallRequestType,
   ): Promise<CallRequestType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
@@ -63,7 +69,7 @@ class CallRequestStore implements CallRequestStoreType {
 
   public setCallRequestAsAccepted = (
     callRequest: CallRequestType,
-    scheduled_at: string
+    scheduled_at: string,
   ): Promise<void> => {
     return new Promise((resolve, reject) => {
       api.callRequests
@@ -77,7 +83,7 @@ class CallRequestStore implements CallRequestStoreType {
   };
 
   public setCallRequestAsDeclined = (
-    callRequest: CallRequestType
+    callRequest: CallRequestType,
   ): Promise<void> => {
     return new Promise((resolve, reject) => {
       api.callRequests
@@ -92,7 +98,7 @@ class CallRequestStore implements CallRequestStoreType {
 
   public setCallRequestAsCanceled = (
     callRequest: CallRequestType,
-    params: CancellCallRequestType
+    params: CancellCallRequestType,
   ): Promise<void> => {
     return new Promise((resolve, reject) => {
       api.callRequests
@@ -106,7 +112,7 @@ class CallRequestStore implements CallRequestStoreType {
   };
 
   public setCallRequestAsFinished = (
-    callRequest: CallRequestType
+    callRequest: CallRequestType,
   ): Promise<void> => {
     return new Promise((resolve, reject) => {
       api.callRequests
@@ -120,7 +126,7 @@ class CallRequestStore implements CallRequestStoreType {
   };
 
   public setCallRequestAsRefunded = (
-    callRequest: CallRequestType
+    callRequest: CallRequestType,
   ): Promise<void> => {
     return new Promise((resolve, reject) => {
       api.callRequests
@@ -134,7 +140,7 @@ class CallRequestStore implements CallRequestStoreType {
   };
 
   public setCallRequestAsStarted = (
-    callRequest: CallRequestType
+    callRequest: CallRequestType,
   ): Promise<CallRequestType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
@@ -147,7 +153,7 @@ class CallRequestStore implements CallRequestStoreType {
   };
 
   public setCallRequestAsPaused = (
-    callRequest: CallRequestType
+    callRequest: CallRequestType,
   ): Promise<CallRequestType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
@@ -161,7 +167,7 @@ class CallRequestStore implements CallRequestStoreType {
 
   public bounceCallRequest = (
     callRequest: CallRequestType,
-    params: BounceCallRequestType
+    params: BounceCallRequestType,
   ): Promise<CallRequestType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
@@ -175,7 +181,7 @@ class CallRequestStore implements CallRequestStoreType {
   };
 
   public createTwilioToken = (
-    callRequest?: CallRequestType
+    callRequest?: CallRequestType,
   ): Promise<string> => {
     return new Promise((resolve, reject) => {
       const call = this.callRequest || callRequest;

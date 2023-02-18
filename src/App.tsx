@@ -6,6 +6,7 @@ import useAppContext from "./hooks/useAppContext";
 import { IpcRendererEvent } from "electron";
 import { parseDeepLink } from "./utils/deeplink";
 import { observer } from "mobx-react-lite";
+import api from "./services/api";
 
 const App: React.FC = () => {
   const { authStore, deeplinkStore, setIsLoading, isLoading } = useAppContext();
@@ -24,7 +25,7 @@ const App: React.FC = () => {
       await authStore.login({ token: parsed.token });
       setIsLoading(false);
     },
-    [authStore, deeplinkStore, setIsLoading]
+    [authStore, deeplinkStore, setIsLoading],
   );
 
   useEffect(() => {
@@ -35,6 +36,19 @@ const App: React.FC = () => {
     ElectronWindow.ipc.on("deep-link", onLinkReceived);
     ElectronWindow.ipc.send("ready-for-deep-link");
   }, [onLinkReceived]);
+
+  useEffect(() => {
+    authStore.login({ token: authStore.currentUser?.token }).catch(() => {
+      authStore.logout();
+    });
+
+    api.applicationVersions.checkLtestVersion().catch((error) => {
+      alert(
+        error?.data?.message ||
+          "Error while checking latest version from Sidetime app. Please restart again",
+      );
+    });
+  }, [authStore]);
 
   if (isLoading) return null;
   return (
