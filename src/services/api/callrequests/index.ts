@@ -1,11 +1,21 @@
+import { PastCallRequestsType } from './../../../types/models';
 import { request } from "../../../utils/axios";
-import { CallRequestType, TokenType } from "../../../types/models";
+import { CallRequestType, TokenType, UpcomingCallRequestsType } from "../../../types/models";
 
-const index = (): Promise<CallRequestType[]> =>
+const getCurrentCalls = (): Promise<UpcomingCallRequestsType> =>
   new Promise((resolve, reject) => {
     request
       .api()
-      .get("/api/v1/call_requests")
+      .get('/api/calls/current_for_all_sites')
+      .then((res) => resolve(res.data))
+      .catch((res) => reject(res.response));
+  });
+
+const getPastCalls = (siteSlug: string): Promise<PastCallRequestsType> =>
+  new Promise((resolve, reject) => {
+    request
+      .api()
+      .get(`/api/sites/${siteSlug}/calls/past`)
       .then((res) => resolve(res.data))
       .catch((res) => reject(res.response));
   });
@@ -28,11 +38,11 @@ const update = (id: number, params: any): Promise<CallRequestType> =>
       .catch((res) => reject(res.response));
   });
 
-const accept = (id: number, scheduled_at: string): Promise<CallRequestType> =>
+const accept = (id: number, scheduledAt: string): Promise<CallRequestType> =>
   new Promise((resolve, reject) => {
     request
       .api()
-      .patch(`/api/v1/call_requests/${id}/accept`, { scheduled_at })
+      .patch(`/api/v1/call_requests/${id}/accept`, { scheduled_at: scheduledAt })
       .then((res) => resolve(res.data))
       .catch((res) => reject(res.response));
   });
@@ -110,7 +120,8 @@ const pause = (id: number): Promise<CallRequestType> =>
   });
 
 const callRequests = {
-  index,
+  getCurrentCalls,
+  getPastCalls,
   get,
   update,
   accept,

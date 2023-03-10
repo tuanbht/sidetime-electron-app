@@ -6,7 +6,6 @@ import useAppContext from "../../../hooks/useAppContext";
 import useModalContext from "../../../hooks/useModalContext";
 import { X } from "react-feather";
 import { useFormik } from "formik";
-import { MarkAsCompleteModalPropsType } from "../../../types/components/CallRequestListItem";
 import {
   goBackButtonStyles,
   refundCallButtonStyles,
@@ -20,12 +19,12 @@ import {
   goBackButtonTextStyles,
   closeButtonStyles,
 } from "./styles";
+import useCallRequestItemContext from "../../../hooks/useCallRequestItemContext";
 
-const RefundCallModal: React.FC<MarkAsCompleteModalPropsType> = ({
-  callRequest,
-}) => {
+const RefundCallModal: React.FC = () => {
   const { callRequestStore, notificationStore } = useAppContext();
   const modalContext = useModalContext();
+  const { callRequest, updateCallRequest } = useCallRequestItemContext();
 
   const form = useFormik({
     initialValues: {},
@@ -33,8 +32,10 @@ const RefundCallModal: React.FC<MarkAsCompleteModalPropsType> = ({
       form.setSubmitting(true);
       callRequestStore
         .setCallRequestAsRefunded(callRequest)
-        .then(() => {
-          const message = `You have successfully refunded the call with ${callRequest.requester.name}`;
+        .then((response) => {
+          // TODO: Replace call request with new response for new serializers
+          updateCallRequest(callRequest);
+          const message = `You have successfully refunded the call with ${callRequest.otherUser.name}`;
           notificationStore.setSuccessNotification(message);
           modalContext.close();
         })

@@ -1,7 +1,6 @@
 import { useFormik } from "formik";
 import React from "react";
 import useAppContext from "../../../hooks/useAppContext";
-import { CommentCreatePropsType } from "../../../types/components/Comments";
 import Button from "../../Button";
 import Input from "../../Input";
 import { schema, schemaValues } from "./form";
@@ -10,10 +9,11 @@ import {
   commentInputStyles,
   sendButtonStyles,
 } from "./styles";
+import useCallRequestItemContext from "../../../hooks/useCallRequestItemContext";
 
-const CommentCreate: React.FC<CommentCreatePropsType> = (props) => {
-  const { callRequest } = props;
+const CommentCreate: React.FC = (props) => {
   const { callRequestCommentsStore } = useAppContext();
+  const { callRequest } = useCallRequestItemContext();
   const form = useFormik({
     initialValues: schemaValues,
     validationSchema: schema,

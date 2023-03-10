@@ -49,36 +49,6 @@ export const proposedTimeTypographyStyles = css`
   color: ${({ theme: { palette } }): string => palette.black};
 `;
 
-export const removeProposedTimeTypographyStyles = css`
-  font-size: 16px;
-  line-height: 16px;
-  font-family: ${({ theme: { fonts } }) => fonts.neuzeitGrotesk};
-  color: ${({ theme: { palette } }): string => palette.dodgerBlue};
-  cursor: pointer;
-`;
-
-export const commentInputStyles = css`
-  margin-top: 24px;
-`;
-
-export const acceptButtonStyles = css<ButtonStyleType>`
-  background-color: ${({
-    theme: {
-      palette: { green, greenDisabled },
-    },
-    disabled,
-  }): string => (disabled ? greenDisabled : green)};
-  &:hover {
-    background-color: ${({
-      theme: {
-        palette: { greenActive, greenDisabled },
-      },
-      disabled,
-    }): string => (disabled ? greenDisabled : greenActive)};
-  }
-  padding: 0px 16px;
-`;
-
 export const declineButtonStyles = css<ButtonStyleType>`
   background-color: ${({
     theme: {

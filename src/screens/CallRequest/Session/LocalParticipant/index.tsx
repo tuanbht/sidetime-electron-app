@@ -105,11 +105,11 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
   };
 
   const callDurantionInSecondsLeft = () => {
-    const { duration_in_mins, minutes_used } = callRequest || {};
+    const { durationInMins, minutesUsed } = callRequest || {};
 
-    if (duration_in_mins === undefined || minutes_used === undefined) return 0;
+    if (durationInMins === undefined || minutesUsed === undefined) return 0;
 
-    return (duration_in_mins - minutes_used) * 60;
+    return (durationInMins - minutesUsed) * 60;
   };
 
   const getScreenThumbnail = (screen: DesktopCapturerSource): string => {

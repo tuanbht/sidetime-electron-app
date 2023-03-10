@@ -54,9 +54,7 @@ class RootStore implements RootStoreType {
 
   private resumeStores = (): void => {
     try {
-      Promise.all([resume("authStore", this.authStore)]).then(() => {
-        // eslint-disable-next-line no-console
-        console.log("Stores states resumed...");
+      Promise.all([resume("authStore", this.authStore), resume("siteStore", this.siteStore)]).then(() => {
         this.setIsLoading(false);
       });
     } catch (err) {

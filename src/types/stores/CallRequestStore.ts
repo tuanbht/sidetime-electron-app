@@ -1,20 +1,22 @@
+import { UpcomingCallRequestsType, PastCallRequestsType } from './../models';
 import { CallRequestType } from "../models";
 
 export type StoreProperties = {
   callRequest: CallRequestType | undefined;
-  callRequests: CallRequestType[] | undefined;
+  pastCallRequests: CallRequestType[] | undefined;
+  upcomingCallRequests: UpcomingCallRequestsType | undefined;
 };
 
 export type UpdateCallRequestType = {
   reply?: string;
-  reply_user_id: string;
-  proposed_times?: string[];
+  replyUserId?: number;
+  proposedTimes?: string[];
 };
 
 export type BounceCallRequestType = {
   reply?: string;
-  reply_user_id: string;
-  proposed_times: string[];
+  replyUserId?: number;
+  proposedTimes: string[];
 };
 
 export type CancellCallRequestType = {
@@ -27,7 +29,8 @@ export type CallRequestTwilioTokenType = {
 };
 
 export type StorePublicInterface = {
-  fetchCallRequests: () => Promise<CallRequestType[]>;
+  fetchCurrentCallRequests: () => Promise<UpcomingCallRequestsType>;
+  fetchPastCallRequests: () => Promise<PastCallRequestsType>;
   fetchCallRequest: (id: string) => Promise<CallRequestType>;
   updateCallRequest: (
     callRequest: CallRequestType,
@@ -35,15 +38,15 @@ export type StorePublicInterface = {
   ) => Promise<CallRequestType>;
   setCallRequestAsAccepted: (
     callRequest: CallRequestType,
-    scheduled_at: string
-  ) => Promise<void>;
-  setCallRequestAsDeclined: (callRequest: CallRequestType) => Promise<void>;
+    scheduledAt: string
+  ) => Promise<CallRequestType>;
+  setCallRequestAsDeclined: (callRequest: CallRequestType) => Promise<CallRequestType>;
   setCallRequestAsCanceled: (
     callRequest: CallRequestType,
     params: CancellCallRequestType
-  ) => Promise<void>;
-  setCallRequestAsFinished: (callRequest: CallRequestType) => Promise<void>;
-  setCallRequestAsRefunded: (callRequest: CallRequestType) => Promise<void>;
+  ) => Promise<CallRequestType>;
+  setCallRequestAsFinished: (callRequest: CallRequestType) => Promise<CallRequestType>;
+  setCallRequestAsRefunded: (callRequest: CallRequestType) => Promise<CallRequestType>;
   setCallRequestAsStarted: (
     callRequest: CallRequestType
   ) => Promise<CallRequestType>;

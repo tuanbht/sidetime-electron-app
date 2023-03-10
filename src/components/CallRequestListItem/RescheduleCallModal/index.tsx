@@ -6,7 +6,6 @@ import useAppContext from "../../../hooks/useAppContext";
 import { X } from "react-feather";
 import { useFormik } from "formik";
 import { schema, schemaValues } from "./form";
-import { RescheduleCallModalPropsType } from "../../../types/components/CallRequestListItem";
 import {
   StyledContainer,
   ModalBodyContainer,
@@ -30,18 +29,17 @@ import TimerPicker from "../../TimePicker";
 import dayjs from "dayjs";
 import {
   getCallPartnerNameBasedOnPerspective,
-  isExpertPerspective,
 } from "../../../utils/callrequest";
+import useCallRequestItemContext from "../../../hooks/useCallRequestItemContext";
 
-const RescheduleCallModal: React.FC<RescheduleCallModalPropsType> = ({
-  callRequest,
-}) => {
+const RescheduleCallModal: React.FC = () => {
   const {
-    callRequestStore: { bounceCallRequest, updateCallRequest },
+    callRequestStore: { bounceCallRequest },
     notificationStore,
-    authStore,
+    authStore: { currentUser, timezone },
   } = useAppContext();
   const modalContext = useModalContext();
+  const { callRequest, updateCallRequest } = useCallRequestItemContext();
 
   const form = useFormik({
     enableReinitialize: false,
@@ -50,15 +48,14 @@ const RescheduleCallModal: React.FC<RescheduleCallModalPropsType> = ({
     validationSchema: schema,
     onSubmit: (values) => {
       form.setSubmitting(true);
-      const action = isExpertPerspective(callRequest, authStore.currentUser)
-        ? bounceCallRequest
-        : updateCallRequest;
 
-      action(callRequest, {
+      bounceCallRequest(callRequest, {
         ...values,
-        reply_user_id: authStore.currentUser?.id || "",
+        replyUserId: currentUser?.id,
       })
-        .then(() => {
+        .then((response) => {
+          // TODO: Replace call request with new response for new serializers
+          updateCallRequest(callRequest);
           notificationStore.setSuccessNotification(
             "Call rescheduling request sent."
           );
@@ -71,13 +68,13 @@ const RescheduleCallModal: React.FC<RescheduleCallModalPropsType> = ({
   });
 
   const onNewTimeAdded = (time: string) => {
-    form.setFieldValue("proposed_times", [...form.values.proposed_times, time]);
+    form.setFieldValue("proposedTimes", [...form.values.proposedTimes, time]);
   };
 
   const onTimeRemoved = (index: number) => {
     form.setFieldValue(
-      "proposed_times",
-      form.values.proposed_times.filter((_, i) => index !== i)
+      "proposedTimes",
+      form.values.proposedTimes.filter((_, i) => index !== i)
     );
   };
 
@@ -89,13 +86,13 @@ const RescheduleCallModal: React.FC<RescheduleCallModalPropsType> = ({
           text="Proposed time(s):"
           css={bodyTextTypographyStyles}
         />
-        {form.values.proposed_times.map((e, index) => {
+        {form.values.proposedTimes.map((e, index) => {
           return (
-            <>
+            <div key={index}>
               <ProposedTimeContainer>
                 <Typography
                   variant="regular"
-                  text={dayjs(e).format("dddd MMM DD YYYY hh:mm A")}
+                  text={dayjs(e).tz(timezone).format("dddd MMM DD YYYY hh:mm A")}
                   css={proposedTimeTypographyStyles}
                 />
                 <Typography
@@ -106,7 +103,7 @@ const RescheduleCallModal: React.FC<RescheduleCallModalPropsType> = ({
                 />
               </ProposedTimeContainer>
               <HorizontalDivider />
-            </>
+            </div>
           );
         })}
       </>
@@ -114,15 +111,13 @@ const RescheduleCallModal: React.FC<RescheduleCallModalPropsType> = ({
   };
 
   const renderBottomTimePicker = () => {
-    const { length } = form.values.proposed_times;
+    const { length } = form.values.proposedTimes;
     if (length === 0 || length >= 5) return null;
 
     return <TimerPicker onAddTime={onNewTimeAdded} />;
   };
 
   const renderCallPartnerName = () => {
-    const { currentUser } = authStore;
-
     if (!currentUser) return "";
     return getCallPartnerNameBasedOnPerspective(callRequest, currentUser);
   };
@@ -148,7 +143,7 @@ const RescheduleCallModal: React.FC<RescheduleCallModalPropsType> = ({
           text={`Propose up to five times that suit you and let ${renderCallPartnerName()} confirm one.`}
           css={bodyTextTypographyStyles}
         />
-        {form.values.proposed_times.length ? (
+        {form.values.proposedTimes.length ? (
           renderProposedTimes()
         ) : (
           <TimerPicker onAddTime={onNewTimeAdded} />

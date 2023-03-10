@@ -13,34 +13,40 @@ import {
   commentAuthorStyles,
   commentTimeStyles,
 } from "./styles";
+import useAppContext from "../../hooks/useAppContext";
+import useCallRequestItemContext from "../../hooks/useCallRequestItemContext";
 
 dayjs.extend(relativeTime);
 
 const CommentListItem: React.FC<CommentListItemPropsType> = (props) => {
-  const { comment, callRequest, side } = props;
-  const { expert, requester } = callRequest;
+  const { comment, side } = props;
+  const { callRequest } = useCallRequestItemContext();
+  const { otherUser } = callRequest;
+
+  const { authStore: { currentUser } } = useAppContext()
 
   const avatarForComment = () => {
-    return (comment.user_id === expert.id ? expert : requester).avatarUrl;
+    return (comment.userId === otherUser.id ? otherUser.avatar : currentUser?.avatarUrl);
   };
 
   const authorForComment = () => {
-    return (comment.user_id === expert.id ? expert : requester).name;
+    return (comment.userId === otherUser.id ? otherUser : currentUser)?.name || '';
   };
 
   const timeLabelForComment = () => {
-    return dayjs(comment.created_at).fromNow();
+    return dayjs(comment.createdAt).fromNow();
   };
 
   const StyledContainer =
     side === "left" ? LeftCommentContainer : RightCommentContainer;
+
   return (
     <StyledContainer>
       <CommentAvatar src={avatarForComment()} />
       <CommentBodyContainer>
         <Typography
           variant="regular"
-          text={comment.body}
+          text={comment.message}
           css={commentTypographyStyles}
         />
         <CommentAuthorContainer>

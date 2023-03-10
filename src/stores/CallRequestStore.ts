@@ -1,3 +1,4 @@
+import { PastCallRequestsType, UpcomingCallRequestsType } from './../types/models';
 import api from "../services/api";
 import { observable, runInAction, makeObservable, action } from "mobx";
 import { RootStoreType } from "../types/stores/RootStore";
@@ -9,19 +10,21 @@ import {
   UpdateCallRequestType,
   CallRequestTwilioTokenType,
 } from "../types/stores/CallRequestStore";
-import { getCallPerspective } from "../utils/callrequest";
 
 class CallRequestStore implements CallRequestStoreType {
   public callRequest: CallRequestType | undefined = undefined;
-  public callRequests: CallRequestType[] | undefined = undefined;
-  public rootStore: RootStoreType | undefined = undefined;
+  public upcomingCallRequests: UpcomingCallRequestsType | undefined = undefined;
+  public pastCallRequests: CallRequestType[] | undefined = undefined;
+  public rootStore: RootStoreType;
 
   constructor(rootStore: RootStoreType) {
     this.rootStore = rootStore;
+
     makeObservable(this, {
       callRequest: observable,
-      callRequests: observable,
-      fetchCallRequests: action,
+      upcomingCallRequests: observable,
+      pastCallRequests: observable,
+      fetchCurrentCallRequests: action,
     });
   }
 
@@ -34,13 +37,13 @@ class CallRequestStore implements CallRequestStoreType {
     });
   };
 
-  public fetchCallRequests = (): Promise<CallRequestType[]> => {
+  public fetchCurrentCallRequests = (): Promise<UpcomingCallRequestsType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
-        .index()
-        .then((callRequests) => {
-          runInAction(() => (this.callRequests = callRequests));
-          resolve(callRequests);
+        .getCurrentCalls()
+        .then((response) => {
+          runInAction(() => this.upcomingCallRequests = response);
+          resolve(response);
         })
         .catch((err) => {
           runInAction(() => {
@@ -48,7 +51,29 @@ class CallRequestStore implements CallRequestStoreType {
             return authStore ? authStore.logout() : () => {};
           });
           reject(err);
-        });
+        })
+    });
+  };
+
+  public fetchPastCallRequests = (): Promise<PastCallRequestsType> => {
+    const siteSlug = this.rootStore.siteStore.siteSlug;
+
+    return new Promise((resolve, reject) => {
+      siteSlug ?
+        api.callRequests
+          .getPastCalls(siteSlug)
+          .then((response) => {
+            runInAction(() => this.pastCallRequests = response.data);
+            resolve(response);
+          })
+          .catch((err) => {
+            runInAction(() => {
+              const authStore = this.rootStore?.authStore;
+              return authStore ? authStore.logout() : () => {};
+            });
+            reject(err);
+          }) :
+        reject('');
     });
   };
 
@@ -60,7 +85,6 @@ class CallRequestStore implements CallRequestStoreType {
       api.callRequests
         .update(callRequest.id, params)
         .then((callRequest) => {
-          this.findAndUpdateCallRequests(callRequest);
           resolve(callRequest);
         })
         .catch((err) => reject(err));
@@ -69,14 +93,13 @@ class CallRequestStore implements CallRequestStoreType {
 
   public setCallRequestAsAccepted = (
     callRequest: CallRequestType,
-    scheduled_at: string,
-  ): Promise<void> => {
+    scheduledAt: string,
+  ): Promise<CallRequestType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
-        .accept(callRequest.id, scheduled_at)
+        .accept(callRequest.id, scheduledAt)
         .then((callRequest) => {
-          this.findAndUpdateCallRequests(callRequest);
-          resolve();
+          resolve(callRequest);
         })
         .catch((err) => reject(err));
     });
@@ -84,13 +107,12 @@ class CallRequestStore implements CallRequestStoreType {
 
   public setCallRequestAsDeclined = (
     callRequest: CallRequestType,
-  ): Promise<void> => {
+  ): Promise<CallRequestType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
         .decline(callRequest.id)
         .then((callRequest) => {
-          this.findAndUpdateCallRequests(callRequest);
-          resolve();
+          resolve(callRequest);
         })
         .catch((err) => reject(err));
     });
@@ -99,13 +121,12 @@ class CallRequestStore implements CallRequestStoreType {
   public setCallRequestAsCanceled = (
     callRequest: CallRequestType,
     params: CancellCallRequestType,
-  ): Promise<void> => {
+  ): Promise<CallRequestType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
         .cancel(callRequest.id, params)
         .then((callRequest) => {
-          this.findAndUpdateCallRequests(callRequest);
-          resolve();
+          resolve(callRequest);
         })
         .catch((err) => reject(err));
     });
@@ -113,13 +134,12 @@ class CallRequestStore implements CallRequestStoreType {
 
   public setCallRequestAsFinished = (
     callRequest: CallRequestType,
-  ): Promise<void> => {
+  ): Promise<CallRequestType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
         .finish(callRequest.id)
         .then((callRequest) => {
-          this.findAndUpdateCallRequests(callRequest);
-          resolve();
+          resolve(callRequest);
         })
         .catch((err) => reject(err));
     });
@@ -127,13 +147,12 @@ class CallRequestStore implements CallRequestStoreType {
 
   public setCallRequestAsRefunded = (
     callRequest: CallRequestType,
-  ): Promise<void> => {
+  ): Promise<CallRequestType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
         .refund(callRequest.id)
         .then((callRequest) => {
-          this.findAndUpdateCallRequests(callRequest);
-          resolve();
+          resolve(callRequest);
         })
         .catch((err) => reject(err));
     });
@@ -173,7 +192,6 @@ class CallRequestStore implements CallRequestStoreType {
       api.callRequests
         .bounce(callRequest.id, params)
         .then((callRequest) => {
-          this.findAndUpdateCallRequests(callRequest);
           resolve(callRequest);
         })
         .catch((err) => reject(err));
@@ -192,10 +210,8 @@ class CallRequestStore implements CallRequestStoreType {
         return;
       }
 
-      const perspective = getCallPerspective(call, currentUser);
-      const { name } = perspective === "expert" ? call.expert : call.requester;
       const token: CallRequestTwilioTokenType = {
-        identity: name,
+        identity: currentUser.name,
         room: call.slug,
       };
 
@@ -203,20 +219,6 @@ class CallRequestStore implements CallRequestStoreType {
         .createToken(call.id, { token: token })
         .then((result) => resolve(result.token))
         .catch((err) => reject(err));
-    });
-  };
-
-  private findAndUpdateCallRequests = (callRequest: CallRequestType) => {
-    const index = this.callRequests?.findIndex((e) => e.id === callRequest.id);
-
-    if (index === -1) return;
-    runInAction(() => {
-      if (!this.callRequests) return;
-      const mutatedArray = [...this.callRequests];
-
-      // @ts-ignore
-      mutatedArray[index] = callRequest;
-      this.callRequests = mutatedArray;
     });
   };
 }

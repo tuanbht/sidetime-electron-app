@@ -8,7 +8,6 @@ import useAppContext from "../../../hooks/useAppContext";
 import dayjs from "dayjs";
 import { X } from "react-feather";
 import { getCallPartnerNameBasedOnPerspective } from "../../../utils/callrequest";
-import { ProposedTimesModalPropsType } from "../../../types/components/CallRequestListItem";
 import {
   StyledContainer,
   ModalBodyContainer,
@@ -22,7 +21,6 @@ import {
   bodyTextTypographyStyles,
   proposedTimeTypographyStyles,
   proposedTimeTimezoneTypographyStyles,
-  declineButtonStyles,
   closeButtonIconStyles,
   goBackButtonTextStyles,
   closeButtonStyles,
@@ -30,20 +28,21 @@ import {
   ProposedHourContainer,
 } from "./styles";
 import { getScheduledCallRequestMessage } from "../../../utils/notifications";
+import useCallRequestItemContext from "../../../hooks/useCallRequestItemContext";
 
-const ProposedTimesModal: React.FC<ProposedTimesModalPropsType> = ({
-  callRequest,
+const ProposedTimesModal: React.FC<{ readOnly?: boolean }> = ({
   readOnly = false,
 }) => {
   const [selectedTime, setSelectedTime] = useState<string>();
   const { callRequestStore, notificationStore, authStore } = useAppContext();
+  const { callRequest, updateCallRequest } = useCallRequestItemContext();
   const modalContext = useModalContext();
 
   const onAcceptButtonClick = () => {
     if (!selectedTime) return;
     callRequestStore
       .setCallRequestAsAccepted(callRequest, selectedTime)
-      .then(() => {
+      .then((response) => {
         const { currentUser } = authStore;
         const message = getScheduledCallRequestMessage(
           callRequest,
@@ -51,16 +50,11 @@ const ProposedTimesModal: React.FC<ProposedTimesModalPropsType> = ({
           selectedTime
         );
 
+        // TODO: Replace call request with new response for new serializers
+        updateCallRequest(callRequest);
         modalContext.close();
         notificationStore.setSuccessNotification(message);
       });
-  };
-
-  const onDeclineButtonClick = () => {
-    callRequestStore.setCallRequestAsDeclined(callRequest).then(() => {
-      modalContext.close();
-      notificationStore.setSuccessNotification("Call marked as declined");
-    });
   };
 
   const renderCallPartnerName = () => {
@@ -74,39 +68,42 @@ const ProposedTimesModal: React.FC<ProposedTimesModalPropsType> = ({
     const name = renderCallPartnerName();
     const message = `${
       readOnly ? "You" : name
-    } would like to schedule a video call with ${readOnly ? name : "you"}`;
+    } would like to schedule a call with ${readOnly ? name : "you"}`;
 
     return message;
   };
 
   const renderProposedTimes = () => {
-    const { proposed_times } = callRequest;
+    const { proposedTimes } = callRequest;
 
-    return proposed_times.map((proposedTime) => (
-      <ProposedTimeContainer key={proposedTime}>
-        {!readOnly ? (
-          <ProposedTimeRadioButton
-            type="radio"
-            checked={selectedTime === proposedTime}
-            onChange={() => {}}
-            onClick={() => setSelectedTime(proposedTime)}
-          />
-        ) : null}
-        <CalendarIcon timestamp={proposedTime} />
-        <ProposedHourContainer>
-          <Typography
-            variant="bold"
-            text={dayjs(proposedTime).format("hh:mmA")}
-            css={proposedTimeTypographyStyles}
-          />
-          <Typography
-            variant="bold"
-            text={authStore.currentUser?.timezone || ""}
-            css={proposedTimeTimezoneTypographyStyles}
-          />
-        </ProposedHourContainer>
-      </ProposedTimeContainer>
-    ));
+    return proposedTimes.map((proposedTime) => {
+      const parsed = dayjs(proposedTime).tz(authStore.timezone);
+
+      return (
+        <ProposedTimeContainer key={proposedTime}>
+          {!readOnly ? (
+            <ProposedTimeRadioButton
+              type="radio"
+              checked={selectedTime === proposedTime}
+              onClick={() => setSelectedTime(proposedTime)}
+            />
+          ) : null}
+          <CalendarIcon timestamp={proposedTime} />
+          <ProposedHourContainer>
+            <Typography
+              variant="bold"
+              text={parsed.format("hh:mmA")}
+              css={proposedTimeTypographyStyles}
+            />
+            <Typography
+              variant="bold"
+              text={parsed.format("z")}
+              css={proposedTimeTimezoneTypographyStyles}
+            />
+          </ProposedHourContainer>
+        </ProposedTimeContainer>
+      )
+    });
   };
 
   return (
@@ -114,7 +111,7 @@ const ProposedTimesModal: React.FC<ProposedTimesModalPropsType> = ({
       <ModalHeaderContainer>
         <Typography
           variant="medium"
-          text="Video call proposal"
+          text="Proposed times"
           css={modalHeaderTypographyStyles}
         />
         <Button
@@ -158,11 +155,6 @@ const ProposedTimesModal: React.FC<ProposedTimesModalPropsType> = ({
                 css={goBackButtonStyles}
               />
             </>
-            <Button
-              text="DECLINE ALL"
-              onClick={onDeclineButtonClick}
-              css={declineButtonStyles}
-            />
             <Button
               disabled={!selectedTime}
               text="ACCEPT SELECTED"
