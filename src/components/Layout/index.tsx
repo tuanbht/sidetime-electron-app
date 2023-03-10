@@ -10,6 +10,8 @@ const Layout: React.FC = (props) => {
   const {
     notificationStore: { notification },
     notificationStore,
+    authStore,
+    userStore,
   } = useAppContext();
 
   useEffect(() => {
@@ -21,6 +23,10 @@ const Layout: React.FC = (props) => {
       );
     });
   }, [notificationStore]);
+
+  useEffect(() => {
+    authStore.checkLoggedInUser() && userStore.getCurrentUser();
+  }, [authStore, authStore.currentUser, userStore])
 
   return (
     <StyledContainer>

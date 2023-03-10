@@ -50,6 +50,8 @@ import {
   actionMenuStyles,
   refreshButtonStyles,
   refreshIconStyles,
+  currentSiteTypographyStyles,
+  LeftWelcomeContainer,
 } from "./styles";
 
 const CallRequestListScreen: React.FC<CallRequestListScreenPropsType> = () => {
@@ -58,6 +60,7 @@ const CallRequestListScreen: React.FC<CallRequestListScreenPropsType> = () => {
   const {
     authStore: { currentUser },
     callRequestStore,
+    siteStore: { currentSite }
   } = useAppContext();
   const { callRequests } = callRequestStore;
   const refreshButtonForm = useFormik({
@@ -208,16 +211,29 @@ const CallRequestListScreen: React.FC<CallRequestListScreenPropsType> = () => {
   return (
     <StyledContainer>
       <WelcomeContainer>
-        <Logo src={logo} />
-        <VerticalDivider css={verticalDividerStyles} />
-        <Typography
-          variant="bold"
-          text={`Hello ${currentUser?.name}! Welcome to Sidetime`}
-          css={welcomeMessageTypographyStyles}
-        />
+        <LeftWelcomeContainer>
+          <Logo src={logo} />
+          <VerticalDivider css={verticalDividerStyles} />
+          <div>
+            <div>
+              <Typography
+                variant="bold"
+                text={`Hello ${currentUser?.name}! Welcome to Sidetime`}
+                css={welcomeMessageTypographyStyles}
+                />
+            </div>
+            {currentSite && <div>
+              <Typography
+                variant="semiBold"
+                text={`You are at ${currentSite?.name}`}
+                css={currentSiteTypographyStyles}
+              />
+            </div>}
+          </div>
+        </LeftWelcomeContainer>
         <RightActionsMenuContainer>
           <Avatar
-            src={currentUser?.avatar_url}
+            src={currentUser?.avatarUrl}
             onMouseEnter={() => menuRef.current?.open()}
             onMouseLeave={() => menuRef.current?.close()}
           />

@@ -9,6 +9,7 @@ export type ActionsMenuStylePropsType = StyledElementPropsType;
 export type ActionsMenuPropsType = ActionsMenuStyleType;
 export type ActionsMenuItemPropsType = {
   text: string;
-  icon: string;
+  iconSrc?: string;
+  iconElement?: React.ReactElement;
   onClick: () => void;
 };

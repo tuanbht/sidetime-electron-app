@@ -3,6 +3,7 @@
   "version": "0.6.1",
   "private": true,
   "main": "public/electron.js",
+  "productName": "Sidetime",
   "description": "Get expert advice from experienced professionals",
   "homepage": "./",
   "dependencies": {

@@ -21,7 +21,7 @@ const CommentListItem: React.FC<CommentListItemPropsType> = (props) => {
   const { expert, requester } = callRequest;
 
   const avatarForComment = () => {
-    return (comment.user_id === expert.id ? expert : requester).avatar_url;
+    return (comment.user_id === expert.id ? expert : requester).avatarUrl;
   };
 
   const authorForComment = () => {
