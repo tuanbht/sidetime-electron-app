@@ -112,7 +112,6 @@ const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
   });
 
   const {
-    id,
     status,
     callTypeName,
     scheduledAt,
@@ -159,7 +158,7 @@ const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
     const onFinishButtonClick = () => markAsCompleteModalRef.current?.open();
     const onShowCommentsButtonClick = () => toggleComments(true);
     const onHideCommentsButtonClick = () => toggleComments(false);
-    const onJoinCallButtonClick = () => history.push(`/call_requests/${id}`);
+    const onJoinCallButtonClick = () => history.push(`/${callRequest.siteSlug}/call_requests/${callRequest.slug}`);
     const onAcceptTimeButtonClick = () => {
       acceptTimeForm.handleSubmit();
     };

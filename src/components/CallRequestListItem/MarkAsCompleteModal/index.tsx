@@ -27,8 +27,7 @@ const MarkAsCompleteModal: React.FC = () => {
 
   const onMarkAsComplete = () => {
     callRequestStore.setCallRequestAsFinished(callRequest).then((response) => {
-      // TODO: Replace call request with new response for new serializers
-      updateCallRequest(callRequest);
+      updateCallRequest(response);
       modalContext.close();
       notificationStore.setSuccessNotification("Call marked as finished");
     });

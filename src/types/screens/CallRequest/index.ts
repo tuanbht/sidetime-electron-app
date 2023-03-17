@@ -8,7 +8,8 @@ import { CallRequestType } from "../../models";
 export type CallRequestListScreenPropsType = {};
 export type CallRequestSessionScreenPropsType = {};
 export type CallRequestSessionScreenRouteParams = {
-  id: string | undefined;
+  siteSlug: string,
+  slug: string | undefined;
 };
 export type RemoteParticipantPropsType = {
   participant: RemoteParticipantType | undefined;

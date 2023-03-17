@@ -2,119 +2,119 @@ import { PastCallRequestsType } from './../../../types/models';
 import { request } from "../../../utils/axios";
 import { CallRequestType, TokenType, UpcomingCallRequestsType } from "../../../types/models";
 
-const getCurrentCalls = (): Promise<UpcomingCallRequestsType> =>
+const getCurrentCalls = (page: number = 1): Promise<UpcomingCallRequestsType> =>
   new Promise((resolve, reject) => {
     request
       .api()
-      .get('/api/calls/current_for_all_sites')
+      .get('/api/calls/current_for_all_sites', { params: { page } })
       .then((res) => resolve(res.data))
       .catch((res) => reject(res.response));
   });
 
-const getPastCalls = (siteSlug: string): Promise<PastCallRequestsType> =>
+const getPastCalls = (siteSlug: string, page: number = 1): Promise<PastCallRequestsType> =>
   new Promise((resolve, reject) => {
     request
       .api()
-      .get(`/api/sites/${siteSlug}/calls/past`)
+      .get(`/api/sites/${siteSlug}/calls/past`, { params: { page } })
       .then((res) => resolve(res.data))
       .catch((res) => reject(res.response));
   });
 
-const get = (id: number): Promise<CallRequestType> =>
+const get = (siteSlug: string, callSlug: string): Promise<CallRequestType> =>
   new Promise((resolve, reject) => {
     request
       .api()
-      .get(`/api/v1/call_requests/${id}`)
+      .get(`/api/sites/${siteSlug}/call_requests/${callSlug}`)
       .then((res) => resolve(res.data))
       .catch((res) => reject(res.response));
   });
 
-const update = (id: number, params: any): Promise<CallRequestType> =>
+const update = (siteSlug: string, id: number, params: any): Promise<CallRequestType> =>
   new Promise((resolve, reject) => {
     request
       .api()
-      .patch(`/api/v1/call_requests/${id}`, params)
+      .patch(`/api/sites/${siteSlug}/call_requests/${id}`, params)
       .then((res) => resolve(res.data))
       .catch((res) => reject(res.response));
   });
 
-const accept = (id: number, scheduledAt: string): Promise<CallRequestType> =>
+const accept = (siteSlug: string, id: number, scheduledAt: string): Promise<CallRequestType> =>
   new Promise((resolve, reject) => {
     request
       .api()
-      .patch(`/api/v1/call_requests/${id}/accept`, { scheduled_at: scheduledAt })
+      .patch(`/api/sites/${siteSlug}/call_requests/${id}/accept`, { scheduledAt })
       .then((res) => resolve(res.data))
       .catch((res) => reject(res.response));
   });
 
-const decline = (id: number): Promise<CallRequestType> =>
+const decline = (siteSlug: string, id: number): Promise<CallRequestType> =>
   new Promise((resolve, reject) => {
     request
       .api()
-      .patch(`/api/v1/call_requests/${id}/decline`)
+      .patch(`/api/sites/${siteSlug}/call_requests/${id}/decline`)
       .then((res) => resolve(res.data))
       .catch((res) => reject(res.response));
   });
 
-const cancel = (id: number, params: any): Promise<CallRequestType> =>
+const cancel = (siteSlug: string, id: number, params: any): Promise<CallRequestType> =>
   new Promise((resolve, reject) => {
     request
       .api()
-      .patch(`/api/v1/call_requests/${id}/cancel`, params)
+      .patch(`/api/sites/${siteSlug}/call_requests/${id}/cancel`, params)
       .then((res) => resolve(res.data))
       .catch((err) => reject(err.response));
   });
 
-const finish = (id: number): Promise<CallRequestType> =>
+const finish = (siteSlug: string, id: number): Promise<CallRequestType> =>
   new Promise((resolve, reject) => {
     request
       .api()
-      .patch(`/api/v1/call_requests/${id}/finish`)
+      .patch(`/api/sites/${siteSlug}/call_requests/${id}/finish`)
       .then((res) => resolve(res.data))
       .catch((res) => reject(res.response));
   });
 
-const refund = (id: number): Promise<CallRequestType> =>
+const refund = (siteSlug: string, id: number): Promise<CallRequestType> =>
   new Promise((resolve, reject) => {
     request
       .api()
-      .patch(`/api/v1/call_requests/${id}/refund`)
+      .patch(`/api/sites/${siteSlug}/call_requests/${id}/refund`)
       .then((res) => resolve(res.data))
       .catch((res) => reject(res.response));
   });
 
-const bounce = (id: number, params: any): Promise<CallRequestType> =>
+const bounce = (siteSlug: string, id: number, params: any): Promise<CallRequestType> =>
   new Promise((resolve, reject) => {
     request
       .api()
-      .patch(`/api/v1/call_requests/${id}/bounce`, params)
+      .patch(`/api/sites/${siteSlug}/call_requests/${id}/bounce`, params)
       .then((res) => resolve(res.data))
       .catch((res) => reject(res.response));
   });
 
-const createToken = (id: number, params: any): Promise<TokenType> =>
+const createToken = (siteSlug: string, id: number, params: any): Promise<TokenType> =>
   new Promise((resolve, reject) => {
     request
       .api()
-      .post(`/api/v1/call_requests/${id}/twilio_video_tokens`, params)
+      .post(`/api/sites/${siteSlug}/call_requests/${id}/twilio_video_tokens`, params)
       .then((res) => resolve(res.data))
       .catch((res) => reject(res.response));
   });
 
-const start = (id: number): Promise<CallRequestType> =>
+const start = (siteSlug: string, id: number): Promise<CallRequestType> =>
   new Promise((resolve, reject) => {
     request
       .api()
-      .patch(`/api/v1/call_requests/${id}/start`)
+      .patch(`/api/sites/${siteSlug}/call_requests/${id}/start`)
       .then((res) => resolve(res.data))
       .catch((res) => reject(res.response));
   });
 
-const pause = (id: number): Promise<CallRequestType> =>
+const pause = (siteSlug: string, id: number): Promise<CallRequestType> =>
   new Promise((resolve, reject) => {
     request
       .api()
-      .patch(`/api/v1/call_requests/${id}/pause`)
+      .patch(`/api/sites/${siteSlug}/call_requests/${id}/pause`)
       .then((res) => resolve(res.data))
       .catch((res) => reject(res.response));
   });

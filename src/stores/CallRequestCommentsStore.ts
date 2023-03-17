@@ -15,62 +15,32 @@ class CallRequestCommentsStore implements CallRequestCommentsStoreType {
     this.comments = new Map();
     makeObservable(this, {
       comments: observable,
-      fetchComments: action,
       createComment: action,
-      destroyComment: action,
       initCommentsForCallRequest: action,
     });
   }
 
-  public fetchComments = (
-    callRequest: CallRequestType
+  public createComment = (
+    callRequest: CallRequestType,
+    commentParams: CreateCommentRequestType
   ): Promise<CommentType[]> => {
     return new Promise((resolve, reject) => {
+      const { id } = callRequest;
+      const params = {
+        comment: {
+          ...commentParams,
+          callRequestId: id,
+          requiresMessage: true
+        }
+      };
       api.comments
-        .index(callRequest.id)
+        .create(params)
         .then((comments) => {
           runInAction(() => {
-            const firstComment = formatCallRequestMessageAsComment({
-              userId: callRequest.requesterId,
-              message: callRequest.message,
-              createdAt: callRequest.createdAt,
-            });
-            this.comments.set(callRequest.id, [firstComment, ...comments]);
+            this.comments.set(id, comments);
           });
           resolve(comments);
         })
-        .catch((err) => reject(err));
-    });
-  };
-
-  public createComment = (
-    callRequest: CallRequestType,
-    params: CreateCommentRequestType
-  ): Promise<CommentType> => {
-    return new Promise((resolve, reject) => {
-      const { id } = callRequest;
-      api.comments
-        .create(callRequest.id, params)
-        .then((comment) => {
-          runInAction(() => {
-            const comments = this.comments.get(id);
-            if (!comments) this.comments.set(id, [comment]);
-            else this.comments.set(id, [...comments, comment]);
-          });
-          resolve(comment);
-        })
-        .catch((err) => reject(err));
-    });
-  };
-
-  public destroyComment = (
-    callRequest: CallRequestType,
-    comment: CommentType
-  ): Promise<CommentType> => {
-    return new Promise((resolve, reject) => {
-      api.comments
-        .destroy(callRequest.id, comment.id)
-        .then((comment) => resolve(comment))
         .catch((err) => reject(err));
     });
   };

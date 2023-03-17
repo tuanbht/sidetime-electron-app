@@ -14,7 +14,7 @@ import {
 class CallRequestStore implements CallRequestStoreType {
   public callRequest: CallRequestType | undefined = undefined;
   public upcomingCallRequests: UpcomingCallRequestsType | undefined = undefined;
-  public pastCallRequests: CallRequestType[] | undefined = undefined;
+  public pastCallRequests: PastCallRequestsType | undefined = undefined;
   public rootStore: RootStoreType;
 
   constructor(rootStore: RootStoreType) {
@@ -28,19 +28,19 @@ class CallRequestStore implements CallRequestStoreType {
     });
   }
 
-  public fetchCallRequest = (id: string): Promise<CallRequestType> => {
+  public fetchCallRequest = (siteSlug: string, callSlug: string): Promise<CallRequestType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
-        .get(parseInt(id))
+        .get(siteSlug, callSlug)
         .then((callRequest) => resolve(callRequest))
         .catch((err) => reject(err));
     });
   };
 
-  public fetchCurrentCallRequests = (): Promise<UpcomingCallRequestsType> => {
+  public fetchCurrentCallRequests = (page?: number): Promise<UpcomingCallRequestsType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
-        .getCurrentCalls()
+        .getCurrentCalls(page)
         .then((response) => {
           runInAction(() => this.upcomingCallRequests = response);
           resolve(response);
@@ -55,15 +55,15 @@ class CallRequestStore implements CallRequestStoreType {
     });
   };
 
-  public fetchPastCallRequests = (): Promise<PastCallRequestsType> => {
+  public fetchPastCallRequests = (page?: number): Promise<PastCallRequestsType> => {
     const siteSlug = this.rootStore.siteStore.siteSlug;
 
     return new Promise((resolve, reject) => {
       siteSlug ?
         api.callRequests
-          .getPastCalls(siteSlug)
+          .getPastCalls(siteSlug, page)
           .then((response) => {
-            runInAction(() => this.pastCallRequests = response.data);
+            runInAction(() => this.pastCallRequests = response);
             resolve(response);
           })
           .catch((err) => {
@@ -83,7 +83,7 @@ class CallRequestStore implements CallRequestStoreType {
   ): Promise<CallRequestType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
-        .update(callRequest.id, params)
+        .update(callRequest.siteSlug, callRequest.id, params)
         .then((callRequest) => {
           resolve(callRequest);
         })
@@ -97,7 +97,7 @@ class CallRequestStore implements CallRequestStoreType {
   ): Promise<CallRequestType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
-        .accept(callRequest.id, scheduledAt)
+        .accept(callRequest.siteSlug, callRequest.id, scheduledAt)
         .then((callRequest) => {
           resolve(callRequest);
         })
@@ -110,7 +110,7 @@ class CallRequestStore implements CallRequestStoreType {
   ): Promise<CallRequestType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
-        .decline(callRequest.id)
+        .decline(callRequest.siteSlug, callRequest.id)
         .then((callRequest) => {
           resolve(callRequest);
         })
@@ -124,7 +124,7 @@ class CallRequestStore implements CallRequestStoreType {
   ): Promise<CallRequestType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
-        .cancel(callRequest.id, params)
+        .cancel(callRequest.siteSlug, callRequest.id, params)
         .then((callRequest) => {
           resolve(callRequest);
         })
@@ -137,7 +137,7 @@ class CallRequestStore implements CallRequestStoreType {
   ): Promise<CallRequestType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
-        .finish(callRequest.id)
+        .finish(callRequest.siteSlug, callRequest.id)
         .then((callRequest) => {
           resolve(callRequest);
         })
@@ -150,7 +150,7 @@ class CallRequestStore implements CallRequestStoreType {
   ): Promise<CallRequestType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
-        .refund(callRequest.id)
+        .refund(callRequest.siteSlug, callRequest.id)
         .then((callRequest) => {
           resolve(callRequest);
         })
@@ -163,7 +163,7 @@ class CallRequestStore implements CallRequestStoreType {
   ): Promise<CallRequestType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
-        .start(callRequest.id)
+        .start(callRequest.siteSlug, callRequest.id)
         .then((callRequest) => {
           resolve(callRequest);
         })
@@ -176,7 +176,7 @@ class CallRequestStore implements CallRequestStoreType {
   ): Promise<CallRequestType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
-        .pause(callRequest.id)
+        .pause(callRequest.siteSlug, callRequest.id)
         .then((callRequest) => {
           resolve(callRequest);
         })
@@ -190,7 +190,7 @@ class CallRequestStore implements CallRequestStoreType {
   ): Promise<CallRequestType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
-        .bounce(callRequest.id, params)
+        .bounce(callRequest.siteSlug, callRequest.id, params)
         .then((callRequest) => {
           resolve(callRequest);
         })
@@ -204,8 +204,9 @@ class CallRequestStore implements CallRequestStoreType {
     return new Promise((resolve, reject) => {
       const call = this.callRequest || callRequest;
       const currentUser = this.rootStore?.authStore?.currentUser;
+      const siteSlug = call?.siteSlug;
 
-      if (!call || !currentUser) {
+      if (!call || !currentUser || !siteSlug) {
         reject("No call request provided");
         return;
       }
@@ -216,7 +217,7 @@ class CallRequestStore implements CallRequestStoreType {
       };
 
       api.callRequests
-        .createToken(call.id, { token: token })
+        .createToken(siteSlug, call.id, { token: token })
         .then((result) => resolve(result.token))
         .catch((err) => reject(err));
     });

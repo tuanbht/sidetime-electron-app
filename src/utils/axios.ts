@@ -21,12 +21,6 @@ const requestInterceptorConfig = (config: AxiosRequestConfig) => {
     ] = siteStore.currentSite?.rootDomain;
   }
 
-  const apiUrl = config?.url || '';
-
-  if (!apiUrl.startsWith('/api/v1')) {
-    config.headers['Key-Inflection'] = 'camel'
-  }
-
   return config;
 };
 
@@ -34,11 +28,11 @@ export const request = {
   api: () => {
     const instance = axios.create({
       baseURL: process.env.REACT_APP_API_URL,
-      // FIXME: Add Key-Inflection config when migrated all APIs
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
-        'System-Access-Key': process.env.REACT_APP_SYSTEM_ACCESS_KEY
+        'System-Access-Key': process.env.REACT_APP_SYSTEM_ACCESS_KEY,
+        'Key-Inflection': 'camel',
       },
 
     });

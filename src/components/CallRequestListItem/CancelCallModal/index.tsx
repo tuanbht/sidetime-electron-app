@@ -45,8 +45,7 @@ const CancelCallModal: React.FC = () => {
       callRequestStore
         .setCallRequestAsCanceled(callRequest, values)
         .then((response) => {
-          // TODO: Replace call request with new response for new serializers
-          updateCallRequest(callRequest);
+          updateCallRequest(response);
           const callPartner = getCallPartnerNameBasedOnPerspective(
             callRequest,
             authStore.currentUser
@@ -55,7 +54,7 @@ const CancelCallModal: React.FC = () => {
           notificationStore.setSuccessNotification(message);
         })
         .catch((err) => {
-          notificationStore.setErrorNotification(err.data[0]);
+          notificationStore.setErrorNotification(err.data.message);
         })
         .finally(() => {
           modalContext.close();

@@ -49,9 +49,7 @@ const ProposedTimesModal: React.FC<{ readOnly?: boolean }> = ({
           currentUser,
           selectedTime
         );
-
-        // TODO: Replace call request with new response for new serializers
-        updateCallRequest(callRequest);
+        updateCallRequest(response);
         modalContext.close();
         notificationStore.setSuccessNotification(message);
       });
