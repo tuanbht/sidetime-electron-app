@@ -7,4 +7,5 @@ export type CallRequestListItemStyleType = {
 
 export type CallRequestListItemPropsType = CallRequestListItemStyleType & {
   callRequest: CallRequestType;
+  belongsToTab: "upcoming" | "history"
 };

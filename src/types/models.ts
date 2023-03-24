@@ -22,8 +22,9 @@ export type UserType = {
 export type SiteType = {
   id: number;
   name: string;
-  rootDomain?: string;
-  slug?: string;
+  rootDomain: string;
+  slug: string;
+  logoUrl?: string;
 };
 
 export type OtherUserType = {
@@ -46,7 +47,7 @@ export type CallRequestType = {
   id: number;
   requesterId: number;
   bundleRequestId: number | null;
-  siteSlug: string;
+  site: SiteType;
   otherUser: OtherUserType;
   callTypeName: string;
   comments: CommentType[];
