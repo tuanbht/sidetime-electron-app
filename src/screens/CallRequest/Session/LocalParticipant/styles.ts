@@ -23,7 +23,7 @@ export const CallContainer = styled.div`
 export const TopContainer = styled.div`
   height: 100vh;
   display: flex;
-  justify-content: flex-end;
+  align-items: flex-start;
 `;
 
 export const BottomContainer = styled.div`
@@ -131,3 +131,39 @@ export const offActionIconStyles: React.CSSProperties = {
   color: theme.palette.white,
   strokeWidth: "1px",
 };
+
+export const WaitingCounterpartContainer = styled.div`
+  height: 170px;
+  margin-left: 20px;
+`;
+
+export const callNameStyles = css`
+  color: ${({ theme: { palette } }): string => palette.slateGrey};
+  font-family: ${({ theme: { fonts } }): string => fonts.neuzeitGrotesk};
+  font-size: 28px;
+`;
+
+export const Divider = styled.div`
+  width: 60%;
+  height: 1px;
+  background-color: ${({ theme: { palette } }): string => palette.blueGrey};
+  margin-top: 4px;
+  margin-bottom: 18px;
+`;
+
+export const BottomWaitingContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+export const waitingCounterButtonStyles = css`
+  background-color: transparent;
+  height: fit-content;
+`;
+
+export const waitingCounterpartTextStyles = css`
+  color: ${({ theme: { palette } }): string => palette.slateGrey};
+  font-family: ${({ theme: { fonts } }): string => fonts.neuzeitGrotesk};
+  margin-right: 12px;
+  font-size: 22px;
+`;

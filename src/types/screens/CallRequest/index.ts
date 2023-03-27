@@ -18,6 +18,7 @@ export type RemoteParticipantPropsType = {
 
 export type LocalParticipantPropsType = {
   participant: LocalParticipantType | undefined;
+  counterpart: RemoteParticipantType | undefined;
   callRequest: CallRequestType | undefined;
   countdownRef?: React.Ref<CountdownInterface>;
   onCallEnded?: () => void;

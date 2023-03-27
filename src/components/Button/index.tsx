@@ -11,7 +11,7 @@ const Button: React.FC<ButtonPropsType> = ({
   disabled = false,
   css,
   buttonTextCss,
-  onClick,
+  onClick = () => {},
 }) => {
   return (
     <ButtonContainer

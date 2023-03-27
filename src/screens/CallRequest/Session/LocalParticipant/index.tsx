@@ -26,6 +26,7 @@ import {
   Settings,
   X,
   Icon as IconType,
+  RefreshCw,
 } from "react-feather";
 import {
   StyledContainer,
@@ -49,7 +50,14 @@ import {
   onActionIconStyles,
   offActionButtonStyles,
   offActionIconStyles,
+  WaitingCounterpartContainer,
+  waitingCounterpartTextStyles,
+  waitingCounterButtonStyles,
+  BottomWaitingContainer,
+  callNameStyles,
+  Divider,
 } from "./styles";
+import Typography from "../../../../components/Typography";
 
 interface ActionButtonState {
   on: IconType | string;
@@ -73,6 +81,7 @@ type ActionButtonMap = StrongTypedMap<
 const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
   const {
     participant,
+    counterpart,
     callRequest,
     countdownRef,
     onCallEnded,
@@ -104,7 +113,7 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
     settings: { on: Settings, off: X },
   };
 
-  const callDurantionInSecondsLeft = () => {
+  const callDurationInSecondsLeft = () => {
     const { durationInMins, minutesUsed } = callRequest || {};
 
     if (durationInMins === undefined || minutesUsed === undefined) return 0;
@@ -303,9 +312,32 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
           ) : (
             <CameraPlaceholder src={cameraPlaceholder} />
           )}
-          {micTrack && isMicEnabled ? (
+          {micTrack && isMicEnabled &&
             <audio ref={audioRef} autoPlay={true} />
-          ) : null}
+          }
+          {!counterpart &&
+            <WaitingCounterpartContainer>
+              <Typography
+                variant="bold"
+                text={callRequest?.callTypeName || 'Open-Ended Conversation'}
+                css={callNameStyles}
+              />
+              <Divider />
+              {callRequest && <BottomWaitingContainer>
+                <Typography
+                  variant="medium"
+                  text={`Waiting for ${callRequest.otherUser.name} to join the call`}
+                  css={waitingCounterpartTextStyles}
+                />
+                <Button
+                  css={waitingCounterButtonStyles}
+                  icon={<RefreshCw size={28}/>}
+                  isLoading
+                  disabled
+                />
+              </BottomWaitingContainer>}
+            </WaitingCounterpartContainer>
+          }
         </TopContainer>
         <BottomContainer>
           <LeftContainer>
@@ -313,7 +345,7 @@ const LocalParticipant: React.FC<LocalParticipantPropsType> = (props) => {
               {callRequest ? (
                 <Countdown
                   ref={countdownRef}
-                  countdownInSeconds={callDurantionInSecondsLeft()}
+                  countdownInSeconds={callDurationInSecondsLeft()}
                   timers={createTimersForCallRequest(
                     callRequest,
                     onCallEnded || (() => {})

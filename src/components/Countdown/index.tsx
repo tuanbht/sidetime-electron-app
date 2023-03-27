@@ -39,9 +39,7 @@ const Countdown: ForwardRefRenderFunction<
     setSeconds(countdownInSeconds);
   }, [countdownInSeconds]);
 
-  useImperativeHandle(ref, () => {
-    return { resume, pause, reset };
-  });
+  useImperativeHandle(ref, () => ({ resume, pause, reset }));
 
   const countdown = (): string => {
     const absSeconds = Math.abs(seconds);
