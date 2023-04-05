@@ -1,3 +1,10 @@
+type ListCallsPaginationType = {
+  total: number;
+  totalPage: number;
+  page: number;
+  pageSize: number;
+}
+
 export type MembershipType = {
   id: number;
   name: string;
@@ -5,7 +12,7 @@ export type MembershipType = {
 }
 
 export type UserType = {
-  id: string;
+  id: number;
   name: string;
   email: string;
   avatarUrl: string;
@@ -25,22 +32,16 @@ export type SiteType = {
   slug?: string;
 };
 
-export type ExpertType = {
+export type OtherUserType = {
   id: number;
   name: string;
-  avatarUrl: string;
-};
-
-export type RequesterType = {
-  id: number;
-  name: string;
-  avatarUrl: string;
+  avatar: string;
 };
 
 export type MessageType = {
-  user_id: number;
-  body: string;
-  created_at: string;
+  userId: number;
+  message: string;
+  createdAt: string;
 };
 
 export type CommentType = MessageType & {
@@ -49,31 +50,19 @@ export type CommentType = MessageType & {
 
 export type CallRequestType = {
   id: number;
-  requester: RequesterType;
-  expert: ExpertType;
-  call_type: string;
-  calls_count: number;
-  charges_count: number;
+  requesterId: number;
+  bundleRequestId: number | null;
+  otherUser: OtherUserType;
+  callTypeName: string;
   comments: CommentType[];
-  comments_count: number;
-  created_at: string;
-  credit_cents: number;
-  duration_in_mins: number;
-  extra_time_in_mins: number;
-  from_bundle: boolean;
-  messaging_enabled: boolean;
-  message: MessageType;
-  minutes_used: number;
-  missed_call_request_id: number | null;
-  premium_fee_cents: number;
-  price_cents: number;
-  total_cost_cents: number;
-  discount: {
-    code: string;
-    percentage_points: number;
-  };
-  proposed_times: string[];
-  scheduled_at: string;
+  createdAt: string;
+  durationInMins: number;
+  messagingEnabled: boolean;
+  message: string;
+  minutesUsed: number;
+  totalCost: number;
+  proposedTimes: string[];
+  scheduledAt: string;
   site: SiteType;
   slug: string;
   status:
@@ -84,12 +73,36 @@ export type CallRequestType = {
     | "completed"
     | "declined"
     | "canceled"
-    | "paused";
+    | "paused"
+    | "extended"
+    | "incomplete"
+    | "pending_connection"
+    | "missed";
   updated_at: string;
-  videoconference: boolean;
-  my_role: "requester" | "expert";
+  communicateVia: "audio" | "videoconference" | "in_person_meeting";
+  refundable: boolean;
+  expertStatus:
+    | 'expert_called' | 'expert_uncalled' | 'expert_busy'
+    | 'expert_failed' | 'expert_no_answer' | 'expert_canceled'
+    | 'expert_connected' | 'expert_completed' | null;
+  callVia: 'system' | 'zoom';
 };
 
 export type TokenType = {
   token: string;
 };
+
+export type UpcomingCallRequestsType = {
+  pagination: ListCallsPaginationType,
+  data: {
+    requiresResponse?: CallRequestType[],
+    pending?: CallRequestType[],
+    completed?: CallRequestType[],
+    scheduled?: CallRequestType[],
+  }
+}
+
+export type PastCallRequestsType = {
+  pagination: ListCallsPaginationType,
+  data: CallRequestType[]
+}

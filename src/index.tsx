@@ -6,6 +6,7 @@ import Theme from "./constants/theme";
 import reportWebVitals from "./reportWebVitals";
 import { ThemeProvider } from "styled-components";
 import { AppContextProvider } from "./contexts/AppContext";
+import './utils/datetime';
 
 // eslint-disable-next-line
 const rollbar = new Rollbar({

@@ -3,6 +3,7 @@ import { LoginFormType } from "../screens/Login";
 
 export type StoreProperties = {
   currentUser: null | undefined | UserType;
+  timezone: string;
 };
 
 export type StorePublicInterface = {

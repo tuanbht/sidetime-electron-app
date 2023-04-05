@@ -3,14 +3,10 @@ import dayjs from "dayjs";
 import HorizontalDivider from "../../HorizontalDivider";
 import Typography from "../../Typography";
 import Button from "../../Button";
-import Input from "../../Input";
-import TimerPicker from "../../TimePicker";
 import useAppContext from "../../../hooks/useAppContext";
 import useModalContext from "../../../hooks/useModalContext";
 import { X } from "react-feather";
 import { useFormik } from "formik";
-import { schema, schemaValues } from "./form";
-import { DeclineCallModalPropsType } from "../../../types/components/CallRequestListItem";
 import {
   StyledContainer,
   ModalBodyContainer,
@@ -18,30 +14,29 @@ import {
   ModalHeaderContainer,
   ProposedTimeContainer,
   goBackButtonStyles,
-  commentInputStyles,
-  acceptButtonStyles,
   declineButtonStyles,
   modalHeaderTypographyStyles,
   bodyTextTypographyStyles,
   proposedTimeTypographyStyles,
-  removeProposedTimeTypographyStyles,
   closeButtonIconStyles,
   goBackButtonTextStyles,
   closeButtonStyles,
 } from "./styles";
+import useCallRequestItemContext from "../../../hooks/useCallRequestItemContext";
 
-const DeclineCallModal: React.FC<DeclineCallModalPropsType> = ({
-  callRequest,
-}) => {
-  const { callRequestStore, notificationStore, authStore } = useAppContext();
+const DeclineCallModal: React.FC = () => {
+  const { callRequestStore, notificationStore, authStore: { timezone } } = useAppContext();
   const modalContext = useModalContext();
+  const { callRequest, updateCallRequest } = useCallRequestItemContext();
   const declineForm = useFormik({
     initialValues: {},
     onSubmit: () => {
       declineForm.setSubmitting(true);
       callRequestStore
         .setCallRequestAsDeclined(callRequest)
-        .then(() => {
+        .then((response) => {
+          // TODO: Replace call request with new response for new serializers
+          updateCallRequest(callRequest);
           modalContext.close();
           notificationStore.setSuccessNotification("Call marked as declined");
         })
@@ -51,42 +46,9 @@ const DeclineCallModal: React.FC<DeclineCallModalPropsType> = ({
     },
   });
 
-  const form = useFormik({
-    enableReinitialize: false,
-    initialValues: schemaValues,
-    validationSchema: schema,
-    validateOnMount: true,
-    onSubmit: (values) => {
-      callRequestStore
-        .bounceCallRequest(callRequest, {
-          ...values,
-          reply_user_id: authStore.currentUser?.id || "",
-        })
-        .then(() => {
-          notificationStore.setSuccessNotification(
-            "Proposal with new time successfully sent"
-          );
-          modalContext.close();
-        })
-        .finally(() => {
-          form.setSubmitting(false);
-        });
-    },
-  });
-
-  const onNewTimeAdded = (time: string) => {
-    form.setFieldValue("proposed_times", [...form.values.proposed_times, time]);
-  };
-
-  const onTimeRemoved = (index: number) => {
-    form.setFieldValue(
-      "proposed_times",
-      form.values.proposed_times.filter((_, i) => index !== i)
-    );
-  };
-
   const renderProposedTimes = () => {
-    if (form.values.proposed_times.length === 0) return null;
+    if (callRequest.proposedTimes.length === 0) return null;
+
     return (
       <>
         <Typography
@@ -94,35 +56,22 @@ const DeclineCallModal: React.FC<DeclineCallModalPropsType> = ({
           text="Proposed time(s):"
           css={bodyTextTypographyStyles}
         />
-        {form.values.proposed_times.map((e, index) => {
+        {callRequest.proposedTimes.map((proposedTime, index) => {
           return (
-            <>
-              <ProposedTimeContainer>
+            <div key={index}>
+              <ProposedTimeContainer >
                 <Typography
                   variant="regular"
-                  text={dayjs(e).format("dddd MMM DD YYYY hh:mm A")}
+                  text={dayjs(proposedTime).tz(timezone).format("dddd MMM DD YYYY hh:mm A")}
                   css={proposedTimeTypographyStyles}
-                />
-                <Typography
-                  variant="regular"
-                  text="Remove"
-                  css={removeProposedTimeTypographyStyles}
-                  onClick={() => onTimeRemoved(index)}
                 />
               </ProposedTimeContainer>
               <HorizontalDivider />
-            </>
+            </div>
           );
         })}
       </>
     );
-  };
-
-  const renderTimePicker = () => {
-    const { length } = form.values.proposed_times;
-    if (length >= 5) return null;
-
-    return <TimerPicker onAddTime={onNewTimeAdded} />;
   };
 
   return (
@@ -141,21 +90,7 @@ const DeclineCallModal: React.FC<DeclineCallModalPropsType> = ({
       </ModalHeaderContainer>
       <HorizontalDivider />
       <ModalBodyContainer>
-        <Typography
-          variant="regular"
-          text={`If none of the proposed time suits you, feel free to propose a time that works better.`}
-          css={bodyTextTypographyStyles}
-        />
         {renderProposedTimes()}
-        {renderTimePicker()}
-        <Input
-          type="text-area"
-          placeholder="Optional comment"
-          value={form.values.reply || ""}
-          numRows={4}
-          onChange={(value) => form.setFieldValue("reply", value)}
-          css={commentInputStyles}
-        />
       </ModalBodyContainer>
       <ModalFooterContainer>
         <Button
@@ -166,17 +101,10 @@ const DeclineCallModal: React.FC<DeclineCallModalPropsType> = ({
         />
         <Button
           text="DECLINE ALL"
-          disabled={form.isValid || declineForm.isSubmitting}
+          disabled={declineForm.isSubmitting}
           isLoading={declineForm.isSubmitting}
           onClick={declineForm.handleSubmit}
           css={declineButtonStyles}
-        />
-        <Button
-          disabled={!form.isValid || form.isSubmitting}
-          isLoading={form.isSubmitting}
-          text="PROPOSE NEW TIME(S)"
-          onClick={form.handleSubmit}
-          css={acceptButtonStyles}
         />
       </ModalFooterContainer>
     </StyledContainer>

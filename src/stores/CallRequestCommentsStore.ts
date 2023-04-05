@@ -30,9 +30,11 @@ class CallRequestCommentsStore implements CallRequestCommentsStoreType {
         .index(callRequest.id)
         .then((comments) => {
           runInAction(() => {
-            const firstComment = formatCallRequestMessageAsComment(
-              callRequest.message
-            );
+            const firstComment = formatCallRequestMessageAsComment({
+              userId: callRequest.requesterId,
+              message: callRequest.message,
+              createdAt: callRequest.createdAt,
+            });
             this.comments.set(callRequest.id, [firstComment, ...comments]);
           });
           resolve(comments);
@@ -77,9 +79,11 @@ class CallRequestCommentsStore implements CallRequestCommentsStoreType {
     if (this.comments.get(callRequest.id)) return;
 
     runInAction(() => {
-      const firstComment = formatCallRequestMessageAsComment(
-        callRequest.message
-      );
+      const firstComment = formatCallRequestMessageAsComment({
+        userId: callRequest.requesterId,
+        message: callRequest.message,
+        createdAt: callRequest.createdAt,
+      });
       this.comments.set(callRequest.id, [
         firstComment,
         ...callRequest.comments,

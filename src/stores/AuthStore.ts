@@ -1,5 +1,6 @@
+import dayjs from "dayjs";
 import api from "../services/api";
-import { observable, runInAction, makeObservable, action } from "mobx";
+import { observable, runInAction, makeObservable, action, computed } from "mobx";
 import { persist } from "mobx-persist";
 import { RootStoreType } from "../types/stores/RootStore";
 import { AuthStoreType } from "../types/stores/AuthStore";
@@ -17,6 +18,7 @@ class AuthStore implements AuthStoreType {
       currentUser: observable,
       login: action,
       logout: action,
+      timezone: computed,
       checkLoggedInUser: action,
     });
   }
@@ -58,6 +60,10 @@ class AuthStore implements AuthStoreType {
   public checkLoggedInUser = (): boolean => {
     return !!this.currentUser;
   };
+
+  get timezone () {
+    return this.currentUser?.timezone || dayjs.tz.guess();
+  }
 }
 
 export default AuthStore;

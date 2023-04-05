@@ -1,34 +1,29 @@
+import { EXPERT_COMPLETED, EXPERT_CONNECTED } from './../constants/states';
 import dayjs from "dayjs";
+import { Users, Video, Phone } from "react-feather";
 import {
   CALL_REQUEST_LIVE,
+  CALL_REQUEST_MISSED,
   CALL_REQUEST_PAUSED,
   CALL_REQUEST_PENDING_EXPERT,
   CALL_REQUEST_PENDING_REQUESTER,
 } from "../constants/states";
 import { CallRequestType, UserType } from "../types/models";
 
-export const isCallRequestStartingIn24HoursOrLess = (
-  callRequest: CallRequestType
+export const isChargeableCancellationFee = (
+  callRequest: CallRequestType,
+  currentUser: null | undefined | UserType
 ) => {
-  // @ts-ignore
-  return dayjs(callRequest.scheduled_at) - dayjs() <= 24; // in hours
+  return isRequesterPerspective(callRequest, currentUser) &&
+    callRequest.scheduledAt &&
+    !isExpertMissedCall(callRequest) &&
+    dayjs(callRequest.scheduledAt).isBefore(dayjs().add(1, 'day'));
 };
 
 export const getCallPerspective = (
   callRequest: CallRequestType,
   currentUser: UserType
-) => {
-  const [requesterId, expertId, userId] = [
-    callRequest.requester.id,
-    callRequest.expert.id,
-    currentUser.id,
-  ].map((e) => e.toString());
-
-  if (callRequest.my_role === "requester" && requesterId === userId)
-    return "requester";
-  if (callRequest.my_role === "expert" && expertId === userId) return "expert";
-  return "";
-};
+) => callRequest.requesterId === currentUser.id ? 'requester' : 'expert';
 
 export const getFormmatedCallRequestStatus = (callRequest: CallRequestType) => {
   const { status } = callRequest;
@@ -42,10 +37,10 @@ export const getCallPartnerNameBasedOnPerspective = (
   if (!currentUser) return "";
 
   if (isRequesterPerspective(callRequest, currentUser)) {
-    return `${callRequest.expert.name} (expert)`;
+    return `${callRequest.otherUser.name} (expert)`;
   }
 
-  return callRequest.requester.name;
+  return callRequest.otherUser.name;
 };
 
 export const isRequesterPerspective = (
@@ -82,7 +77,7 @@ export const isSingleProposedCallRequest = (callRequest: CallRequestType) => {
   return (
     [CALL_REQUEST_PENDING_EXPERT, CALL_REQUEST_PENDING_REQUESTER].includes(
       callRequest.status
-    ) && callRequest.proposed_times.length <= 1
+    ) && callRequest.proposedTimes.length <= 1
   );
 };
 
@@ -90,33 +85,38 @@ export const isMultiProposedCallRequest = (callRequest: CallRequestType) => {
   return (
     [CALL_REQUEST_PENDING_EXPERT, CALL_REQUEST_PENDING_REQUESTER].includes(
       callRequest.status
-    ) && callRequest.proposed_times.length > 1
+    ) && callRequest.proposedTimes.length > 1
   );
 };
 
-export const getCallRequestTimestamp = (callRequest: CallRequestType) => {
-  const { scheduled_at, proposed_times } = callRequest;
-  if (scheduled_at) return scheduled_at;
-  return proposed_times[0];
-};
+export const getCallCommunicationMethod = (callRequest: CallRequestType) => {
+  const { communicateVia } = callRequest;
 
-export const getCallRequestTime = (callRequest: CallRequestType) => {
-  if (
-    isCallRequestPending(callRequest) &&
-    isMultiProposedCallRequest(callRequest)
-  )
-    return "TBC";
+  switch(communicateVia) {
+    case 'in_person_meeting':
+      return {
+        icon: Users,
+        callMethodName: 'In-Person Meeting',
+      }
+    case 'videoconference':
+      return {
+        icon: Video,
+        callMethodName: 'Video Call',
+      }
+    default:
+      return {
+        icon: Phone,
+        callMethodName: 'Phone Call'
+      }
+  }
+}
 
-  const timestamp = getCallRequestTimestamp(callRequest);
-  return dayjs(timestamp).format("hh:mmA");
-};
+export const isValidProposedTime = (proposedTime: string) => dayjs(proposedTime).isAfter(dayjs().add(1, 'hour'));
 
-export const getCallTimezone = (
-  callRequest: CallRequestType,
-  currentUser: UserType
-) => {
-  const { scheduled_at, proposed_times } = callRequest;
-  if (!scheduled_at && proposed_times.length > 1)
-    return "MULTIPLE TIMES PROPOSED";
-  return currentUser?.timezone || "";
-};
+export const isCallFromBundle = (callRequest: CallRequestType) => Number.isInteger(callRequest.bundleRequestId);
+
+export const isExpertMissedCall = (callRequest: CallRequestType) => {
+  const { expertStatus, status } = callRequest;
+
+  return status === CALL_REQUEST_MISSED && expertStatus && ![EXPERT_CONNECTED, EXPERT_COMPLETED].includes(expertStatus);
+}

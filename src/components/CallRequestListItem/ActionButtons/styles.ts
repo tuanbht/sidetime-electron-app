@@ -9,6 +9,7 @@ export const greenButtonStyles = css<ButtonStyleType>`
     background-color: ${({ theme: { palette } }): string =>
       palette.greenActive};
   }
+  margin-right: 8px;
 `;
 
 export const actionButtonStyles = css<ButtonStyleType>`

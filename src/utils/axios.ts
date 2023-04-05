@@ -1,25 +1,33 @@
+import { SiteStoreType } from './../types/stores/SiteStore';
 import axios, { AxiosRequestConfig } from "axios";
 import { AuthStoreType } from "../types/stores/AuthStore";
 
-const REQUEST_INTERCEPTORS = {
-  auth: (config: AxiosRequestConfig) => {
-    const value = localStorage.getItem("authStore");
+const requestInterceptorConfig = (config: AxiosRequestConfig) => {
+  const persistedAuth = localStorage.getItem("authStore");
 
-    if (value) {
-      const authStore: AuthStoreType = JSON.parse(value);
-      config.headers[
-        "Authorization"
-      ] = `Bearer ${authStore.currentUser?.token}`;
-    }
+  if (persistedAuth) {
+    const authStore: AuthStoreType = JSON.parse(persistedAuth);
+    config.headers[
+      "Authorization"
+    ] = `Bearer ${authStore.currentUser?.token}`;
+  }
 
-    const apiUrl = config?.url || '';
+  const persistedSite = localStorage.getItem("siteStore");
 
-    if (!apiUrl.startsWith('/api/v1')) {
-      config.headers['Key-Inflection'] = 'camel'
-    }
+  if (persistedSite) {
+    const siteStore: SiteStoreType = JSON.parse(persistedSite);
+    config.headers[
+      "Root-Domain"
+    ] = siteStore.currentSite?.rootDomain;
+  }
 
-    return config;
-  },
+  const apiUrl = config?.url || '';
+
+  if (!apiUrl.startsWith('/api/v1')) {
+    config.headers['Key-Inflection'] = 'camel'
+  }
+
+  return config;
 };
 
 export const request = {
@@ -30,11 +38,12 @@ export const request = {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
+        'System-Access-Key': process.env.REACT_APP_SYSTEM_ACCESS_KEY
       },
 
     });
 
-    instance.interceptors.request.use(REQUEST_INTERCEPTORS.auth);
+    instance.interceptors.request.use(requestInterceptorConfig);
     return instance;
   },
 };

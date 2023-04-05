@@ -10,6 +10,7 @@ import {
   dayTypographyStyles,
   dayOfTheWeekTypographyStyles,
 } from "./styles";
+import useAppContext from "../../hooks/useAppContext";
 
 const CalendarIcon: React.FC<CalendarIconPropsType> = ({
   timestamp,
@@ -17,18 +18,21 @@ const CalendarIcon: React.FC<CalendarIconPropsType> = ({
   day,
   dayofTheWeek,
 }) => {
+  const { authStore: { timezone } } = useAppContext();
+
   const date = useMemo(() => {
     if (month && day && dayofTheWeek) {
       return { month, day, dayofTheWeek };
     }
 
-    const parsed = dayjs(timestamp || new Date());
-    return {
+    const parsed = dayjs(timestamp || new Date()).tz(timezone);
+
+    return  {
       month: parsed.format("MMM").toUpperCase(),
       day: parsed.format("D"),
       dayofTheWeek: parsed.format("ddd").toUpperCase(),
     };
-  }, [timestamp, month, day, dayofTheWeek]);
+  }, [month, day, dayofTheWeek, timestamp, timezone]);
 
   return (
     <StyledContainer>

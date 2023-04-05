@@ -9,10 +9,8 @@ import { useFormik } from "formik";
 import { X, AlertCircle } from "react-feather";
 import {
   getCallPartnerNameBasedOnPerspective,
-  isCallRequestStartingIn24HoursOrLess,
+  isChargeableCancellationFee,
 } from "../../../utils/callrequest";
-import { CALL_REQUEST_SCHEDULED } from "../../../constants/states";
-import { CancelCallModalPropsType } from "../../../types/components/CallRequestListItem";
 import { schema, schemaValues } from "./form";
 import {
   goBackButtonStyles,
@@ -30,12 +28,12 @@ import {
   closeButtonStyles,
   DisclaimerContainer,
 } from "./styles";
+import useCallRequestItemContext from "../../../hooks/useCallRequestItemContext";
 
-const CancelCallModal: React.FC<CancelCallModalPropsType> = ({
-  callRequest,
-}) => {
+const CancelCallModal: React.FC = () => {
   const { callRequestStore, notificationStore, authStore } = useAppContext();
   const modalContext = useModalContext();
+  const { callRequest, updateCallRequest } = useCallRequestItemContext();
 
   const form = useFormik({
     enableReinitialize: false,
@@ -46,8 +44,9 @@ const CancelCallModal: React.FC<CancelCallModalPropsType> = ({
       form.setSubmitting(true);
       callRequestStore
         .setCallRequestAsCanceled(callRequest, values)
-        .then(() => {
-          if (!authStore.currentUser) return;
+        .then((response) => {
+          // TODO: Replace call request with new response for new serializers
+          updateCallRequest(callRequest);
           const callPartner = getCallPartnerNameBasedOnPerspective(
             callRequest,
             authStore.currentUser
@@ -86,8 +85,7 @@ const CancelCallModal: React.FC<CancelCallModalPropsType> = ({
           text="Are you sure you want to cancel this call?"
           css={confirmationTypographyStyles}
         />
-        {callRequest.status === CALL_REQUEST_SCHEDULED &&
-        isCallRequestStartingIn24HoursOrLess(callRequest) ? (
+        {isChargeableCancellationFee(callRequest, authStore.currentUser) && (
           <DisclaimerContainer>
             <AlertCircle size={48} style={disclaimerIconStyles} />
             <Typography
@@ -96,7 +94,7 @@ const CancelCallModal: React.FC<CancelCallModalPropsType> = ({
               css={disclaimerTypographyStyles}
             />
           </DisclaimerContainer>
-        ) : null}
+        )}
         <Input
           type="text-area"
           placeholder="Optional comment"

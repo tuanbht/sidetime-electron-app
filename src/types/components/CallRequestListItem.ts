@@ -8,15 +8,3 @@ export type CallRequestListItemStyleType = {
 export type CallRequestListItemPropsType = CallRequestListItemStyleType & {
   callRequest: CallRequestType;
 };
-
-export type CallListItemActionsModalPropsType = {
-  callRequest: CallRequestType;
-};
-
-export type CancelCallModalPropsType = CallListItemActionsModalPropsType;
-export type DeclineCallModalPropsType = CallListItemActionsModalPropsType;
-export type MarkAsCompleteModalPropsType = CallListItemActionsModalPropsType;
-export type ProposedTimesModalPropsType = CallListItemActionsModalPropsType & {
-  readOnly?: boolean;
-};
-export type RescheduleCallModalPropsType = CallListItemActionsModalPropsType;

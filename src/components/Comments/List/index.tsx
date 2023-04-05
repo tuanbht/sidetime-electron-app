@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from "uuid";
 import { observer } from "mobx-react-lite";
 import { Timer } from "../../../utils/timer";
 import { StyledContainer, previousCommentsButtonStyles } from "./styles";
+import useCallRequestItemContext from "../../../hooks/useCallRequestItemContext";
 
 dayjs.extend(relativeTime);
 
@@ -20,12 +21,13 @@ const CommentsList: React.FC<CommentsListPropsType> = (props) => {
     authStore: { currentUser },
     callRequestCommentsStore,
   } = useAppContext();
-  const { callRequest, children } = props;
+  const { callRequest } = useCallRequestItemContext();
+  const { children } = props;
   const { id } = callRequest;
   const comments = callRequestCommentsStore.comments.get(id);
 
   const sideForComment = (comment: CommentType) => {
-    return currentUser?.id.toString() === comment.user_id.toString()
+    return currentUser?.id === comment.userId
       ? "right"
       : "left";
   };
@@ -46,7 +48,7 @@ const CommentsList: React.FC<CommentsListPropsType> = (props) => {
     if (!comments || comments.length === 0) return;
 
     const last = comments[comments.length - 1];
-    const ago = dayjs(last.created_at).fromNow(true);
+    const ago = dayjs(last.createdAt).fromNow(true);
     const onTimerExpire = () =>
       callRequestCommentsStore.fetchComments(callRequest);
     const isLastMessageRecent =
@@ -82,7 +84,6 @@ const CommentsList: React.FC<CommentsListPropsType> = (props) => {
             key={uuidv4()}
             side={sideForComment(comment)}
             comment={comment}
-            callRequest={callRequest}
           />
         );
       })}

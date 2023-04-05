@@ -7,30 +7,14 @@ import VerticalDivider from "../../../components/VerticalDivider";
 import logo from "../../../assets/logo.png";
 import { RefreshCw } from "react-feather";
 import { useFormik } from "formik";
-import { Timer } from "../../../utils/timer";
 import ActionsMenu, {
   ActionsMenuInterface,
 } from "../../../components/ActionsMenu";
 import { observer } from "mobx-react-lite";
 import {
-  isExpertPerspective,
-  isRequesterPerspective,
-} from "../../../utils/callrequest";
-import {
   NO_PENDING_CALLS,
   NO_SCHEDULED_CALLS,
-  NO_COMPLETED_CALLS,
 } from "../../../constants/messages";
-import {
-  CALL_REQUEST_COMPLETED,
-  CALL_REQUEST_PENDING_EXPERT,
-  CALL_REQUEST_PENDING_REQUESTER,
-  CALL_REQUEST_LIVE,
-  CALL_REQUEST_SCHEDULED,
-  CALL_REQUEST_CANCELED,
-  CALL_REQUEST_DECLINED,
-  CALL_REQUEST_PAUSED,
-} from "../../../constants/states";
 import { CallRequestType } from "../../../types/models";
 import { CallRequestListScreenPropsType } from "../../../types/screens/CallRequest";
 import {
@@ -62,14 +46,15 @@ const CallRequestListScreen: React.FC<CallRequestListScreenPropsType> = () => {
     callRequestStore,
     siteStore: { currentSite }
   } = useAppContext();
-  const { callRequests } = callRequestStore;
+  const { upcomingCallRequests, pastCallRequests } = callRequestStore;
   const refreshButtonForm = useFormik({
     initialValues: {},
     onSubmit: () => {
       refreshButtonForm.setSubmitting(true);
-      callRequestStore
-        .fetchCallRequests()
-        .finally(() => refreshButtonForm.setSubmitting(false));
+
+      const fetchingCallsPromise = tab === 'upcoming' ? callRequestStore.fetchCurrentCallRequests() :
+        callRequestStore.fetchPastCallRequests();
+      fetchingCallsPromise.finally(() => refreshButtonForm.setSubmitting(false));
     },
   });
 
@@ -126,88 +111,39 @@ const CallRequestListScreen: React.FC<CallRequestListScreenPropsType> = () => {
   };
 
   useEffect(() => {
-    const timer = new Timer(() => callRequestStore.fetchCallRequests(), {
-      minutes: 5,
-      repeat: true,
-    });
-
-    return () => timer.clear();
+    callRequestStore.fetchCurrentCallRequests();
   }, [callRequestStore]);
 
   useEffect(() => {
-    callRequestStore.fetchCallRequests();
-  }, [callRequestStore]);
+    callRequestStore.fetchPastCallRequests();
+  }, [callRequestStore, currentSite]);
 
   const upcommingTab = useMemo(() => {
-    if (!callRequests) return [];
+    if (!upcomingCallRequests) return [];
 
-    const live = callRequests?.filter(
-      ({ status }) =>
-        status === CALL_REQUEST_LIVE || status === CALL_REQUEST_PAUSED
-    );
-    const scheduled = callRequests?.filter(
-      ({ status }) => status === CALL_REQUEST_SCHEDULED
-    );
-    const pending = callRequests?.filter(
-      (callRequest) =>
-        (callRequest.status === CALL_REQUEST_PENDING_EXPERT &&
-          isRequesterPerspective(callRequest, currentUser)) ||
-        (callRequest.status === CALL_REQUEST_PENDING_REQUESTER &&
-          isExpertPerspective(callRequest, currentUser))
-    );
-    const awaiting = callRequests?.filter(
-      (callRequest) =>
-        (callRequest.status === CALL_REQUEST_PENDING_REQUESTER &&
-          isRequesterPerspective(callRequest, currentUser)) ||
-        (callRequest.status === CALL_REQUEST_PENDING_EXPERT &&
-          isExpertPerspective(callRequest, currentUser))
-    );
+    const { requiresResponse, pending, scheduled, completed } = upcomingCallRequests.data
 
     return [
       ...[
-        awaiting.length > 0
-          ? renderTabSection("PENDING YOUR CONFIRMATION", awaiting)
+        requiresResponse
+          ? renderTabSection("PENDING YOUR CONFIRMATION", requiresResponse)
           : null,
       ],
-      ...[live.length > 0 ? renderTabSection("LIVE", live) : null],
       ...renderTabSection("SCHEDULED", scheduled, NO_SCHEDULED_CALLS),
       ...renderTabSection("PENDING CONFIRMATION", pending, NO_PENDING_CALLS),
+      ...[
+        completed
+          ? renderTabSection("COMPLETED", completed)
+          : null,
+      ],
     ];
-  }, [callRequests, currentUser]);
-
-  const completedTab = useMemo(() => {
-    const completed = callRequests
-      ?.filter(({ status }) => status === CALL_REQUEST_COMPLETED)
-      .sort(
-        (e, i) =>
-          new Date(e.scheduled_at).getTime() -
-          new Date(i.scheduled_at).getTime()
-      )
-      .reverse();
-
-    return [...renderTabSection("COMPLETED", completed, NO_COMPLETED_CALLS)];
-  }, [callRequests]);
+  }, [upcomingCallRequests]);
 
   const historyTab = useMemo(() => {
-    const calls = (
-      callRequests?.filter(({ status }) =>
-        [
-          CALL_REQUEST_DECLINED,
-          CALL_REQUEST_CANCELED,
-          CALL_REQUEST_COMPLETED,
-        ].includes(status)
-      ) || []
-    )
-      .sort(
-        (e, i) =>
-          new Date(e.scheduled_at || e.proposed_times[0]).getTime() -
-          new Date(i.scheduled_at || i.proposed_times[0]).getTime()
-      )
-      .reverse();
+    return (pastCallRequests || []).map((callRequest) => <CallRequestListItem callRequest={callRequest} key={callRequest.id} />);
+  }, [pastCallRequests]);
 
-    return calls.map((e) => <CallRequestListItem callRequest={e} key={e.id} />);
-  }, [callRequests]);
-
+  // TODO: Integrate completed calls
   return (
     <StyledContainer>
       <WelcomeContainer>
@@ -254,7 +190,7 @@ const CallRequestListScreen: React.FC<CallRequestListScreenPropsType> = () => {
       </TabsContainer>
       <TabContainer>
         {tab === "upcoming" ? upcommingTab : null}
-        {tab === "completed" ? completedTab : null}
+        {/* {tab === "completed" ? completedTab : null} */}
         {tab === "history" ? historyTab : null}
       </TabContainer>
     </StyledContainer>

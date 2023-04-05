@@ -4,10 +4,10 @@ import { RescheduleCallFormType } from "../../../types/components/RescheduleCall
 
 export const schemaValues: RescheduleCallFormType = {
   reply: "",
-  proposed_times: [],
+  proposedTimes: [],
 };
 
 export const schema = Yup.object().shape({
   reply: Yup.string(),
-  proposed_times: Yup.array().min(1).max(5).required(REQUIRED_FIELD_MESSAGE),
+  proposedTimes: Yup.array().min(1).max(5).required(REQUIRED_FIELD_MESSAGE),
 });

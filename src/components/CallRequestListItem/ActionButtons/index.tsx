@@ -10,15 +10,19 @@ import { v4 as uuidv4 } from "uuid";
 import { ReactComponent as Refund } from "../../../assets/refund.svg";
 import { CallRequestType, UserType } from "../../../types/models";
 import {
+  isCallFromBundle,
+  isExpertMissedCall,
   isExpertPerspective,
   isRequesterPerspective,
+  isValidProposedTime,
 } from "../../../utils/callrequest";
 import {
-  CALL_REQUEST_LIVE,
   CALL_REQUEST_PENDING_EXPERT,
   CALL_REQUEST_PENDING_REQUESTER,
   CALL_REQUEST_SCHEDULED,
-  CALL_REQUEST_PAUSED,
+  CALL_REQUEST_FINISHABLE,
+  CALL_REQUEST_IN_PROGRESS,
+  CALL_REQUEST_PENDING,
 } from "../../../constants/states";
 import {
   actionIconStyles,
@@ -45,10 +49,9 @@ export const DECLINE_CALL_BUTTON = {
     />
   ),
   validate: (callRequest: CallRequestType, currentUser: UserType) =>
-    (callRequest.status === CALL_REQUEST_PENDING_REQUESTER &&
-      isRequesterPerspective(callRequest, currentUser)) ||
     (isExpertPerspective(callRequest, currentUser) &&
-      callRequest.status === CALL_REQUEST_PENDING_EXPERT),
+      !isCallFromBundle(callRequest) &&
+      CALL_REQUEST_PENDING.includes(callRequest.status)),
 };
 
 export const VIEW_CALL_PROPOSED_TIMES_BUTTON = {
@@ -61,7 +64,7 @@ export const VIEW_CALL_PROPOSED_TIMES_BUTTON = {
     />
   ),
   validate: (callRequest: CallRequestType, currentUser: UserType) =>
-    callRequest.proposed_times.length > 1 &&
+    callRequest.proposedTimes.length > 1 &&
     ((callRequest.status === CALL_REQUEST_PENDING_REQUESTER &&
       isRequesterPerspective(callRequest, currentUser)) ||
       (callRequest.status === CALL_REQUEST_PENDING_EXPERT &&
@@ -81,7 +84,7 @@ export const ACCEPT_PROPOSED_TIME_BUTTON = {
     />
   ),
   validate: (callRequest: CallRequestType, currentUser: UserType) =>
-    callRequest.proposed_times.length <= 1 &&
+    callRequest.proposedTimes.length === 1 && isValidProposedTime(callRequest.proposedTimes[0]) &&
     ((callRequest.status === CALL_REQUEST_PENDING_REQUESTER &&
       isRequesterPerspective(callRequest, currentUser)) ||
       (callRequest.status === CALL_REQUEST_PENDING_EXPERT &&
@@ -114,7 +117,11 @@ export const CANCEL_CALL_BUTTON = {
     />
   ),
   validate: (callRequest: CallRequestType, _: UserType) =>
-    callRequest.status === CALL_REQUEST_SCHEDULED,
+    !isCallFromBundle(callRequest) &&
+      (
+        [...CALL_REQUEST_PENDING, CALL_REQUEST_SCHEDULED].includes(callRequest.status) ||
+        isExpertMissedCall(callRequest)
+      ),
 };
 
 export const RESCHEDULE_CALL_BUTTON = {
@@ -128,9 +135,13 @@ export const RESCHEDULE_CALL_BUTTON = {
   ),
   validate: (callRequest: CallRequestType, currentUser: UserType) =>
     (isRequesterPerspective(callRequest, currentUser) &&
-      callRequest.status === CALL_REQUEST_PENDING_EXPERT) ||
+      callRequest.status === CALL_REQUEST_PENDING_REQUESTER) ||
     (isExpertPerspective(callRequest, currentUser) &&
-      callRequest.status === CALL_REQUEST_SCHEDULED),
+      (
+        [CALL_REQUEST_PENDING_EXPERT, CALL_REQUEST_SCHEDULED].includes(callRequest.status) ||
+        isExpertMissedCall(callRequest)
+      )
+    ),
 };
 
 export const MARK_CALL_FINISHED_BUTTON = {
@@ -143,8 +154,7 @@ export const MARK_CALL_FINISHED_BUTTON = {
     />
   ),
   validate: (callRequest: CallRequestType, _currentUser: UserType) =>
-    callRequest.status === CALL_REQUEST_LIVE ||
-    callRequest.status === CALL_REQUEST_PAUSED,
+    CALL_REQUEST_FINISHABLE.includes(callRequest.status)
 };
 
 export const JOIN_CALL_BUTTON = {
@@ -158,9 +168,9 @@ export const JOIN_CALL_BUTTON = {
     />
   ),
   validate: (callRequest: CallRequestType, _currentUser: UserType) =>
-    (callRequest.status === CALL_REQUEST_LIVE ||
-      callRequest.status === CALL_REQUEST_PAUSED) &&
-    callRequest.videoconference,
+    CALL_REQUEST_IN_PROGRESS.includes(callRequest.status) &&
+      callRequest.callVia === 'system' &&
+      callRequest.communicateVia === 'videoconference',
 };
 
 export const SHOW_CALL_COMMENTS_BUTTON = {
@@ -197,7 +207,7 @@ export const REFUND_CALL_BUTTON = {
     />
   ),
   validate: (callRequest: CallRequestType, currentUser: UserType) =>
-    callRequest.status === CALL_REQUEST_LIVE &&
+    callRequest.refundable &&
     isExpertPerspective(callRequest, currentUser),
 };
 

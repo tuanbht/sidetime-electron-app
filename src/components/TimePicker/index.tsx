@@ -13,16 +13,20 @@ import {
   inputStyles,
 } from "./styles";
 import dayjs from "dayjs";
+import useAppContext from "../../hooks/useAppContext";
 
 const TimerPicker: React.FC<TimePickerPropsType> = ({ onAddTime }) => {
+  const { authStore: { timezone } } = useAppContext();
+
   const form = useFormik({
     enableReinitialize: false,
     initialValues: schemeValues,
     validationSchema: schema,
     onSubmit: (values) => {
-      const date = new Date(`${values.date} ${values.time}`);
-      const formated = dayjs(date).format("YYYY-MM-DD HH:mm:00 ZZ");
-      onAddTime(formated);
+      const date = dayjs(new Date(`${values.date} ${values.time}`)).format('YYYY-MM-DD HH:mm:00');
+      const convertedDate = dayjs.tz(date, timezone).toISOString();
+
+      onAddTime(convertedDate);
     },
   });
   return (

@@ -1,7 +1,8 @@
 import { SiteType } from "../models";
 
 export type StoreProperties = {
-  currentSite: SiteType | undefined
+  currentSite: SiteType | undefined,
+  siteSlug: string | undefined,
 };
 
 export type StorePublicInterface = {

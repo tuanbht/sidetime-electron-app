@@ -5,7 +5,6 @@ import Button from "../../Button";
 import useAppContext from "../../../hooks/useAppContext";
 import useModalContext from "../../../hooks/useModalContext";
 import { X } from "react-feather";
-import { MarkAsCompleteModalPropsType } from "../../../types/components/CallRequestListItem";
 import {
   goBackButtonStyles,
   markAsCompleteButtonStyles,
@@ -19,15 +18,17 @@ import {
   goBackButtonTextStyles,
   closeButtonStyles,
 } from "./styles";
+import useCallRequestItemContext from "../../../hooks/useCallRequestItemContext";
 
-const MarkAsCompleteModal: React.FC<MarkAsCompleteModalPropsType> = ({
-  callRequest,
-}) => {
+const MarkAsCompleteModal: React.FC = () => {
   const { callRequestStore, notificationStore } = useAppContext();
   const modalContext = useModalContext();
+  const { callRequest, updateCallRequest } = useCallRequestItemContext();
 
   const onMarkAsComplete = () => {
-    callRequestStore.setCallRequestAsFinished(callRequest).then(() => {
+    callRequestStore.setCallRequestAsFinished(callRequest).then((response) => {
+      // TODO: Replace call request with new response for new serializers
+      updateCallRequest(callRequest);
       modalContext.close();
       notificationStore.setSuccessNotification("Call marked as finished");
     });

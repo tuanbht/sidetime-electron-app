@@ -92,15 +92,6 @@ export const acceptButtonStyles = css<ButtonStyleType>`
   padding: 0px 16px;
 `;
 
-export const declineButtonStyles = css<ButtonStyleType>`
-  background-color: ${({ theme: { palette } }): string => palette.red};
-  &:hover {
-    background-color: ${({ theme: { palette } }): string => palette.redActive};
-  }
-  margin-left: auto;
-  margin-right: 10px;
-`;
-
 export const goBackButtonStyles = css<ButtonStyleType>`
   background-color: ${({ theme: { palette } }): string => palette.white};
   &:hover {
