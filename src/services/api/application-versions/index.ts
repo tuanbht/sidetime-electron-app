@@ -1,7 +1,7 @@
 import { request } from "../../../utils/axios";
 import { UserType } from "../../../types/models";
 
-const checkLtestVersion = (): Promise<UserType> =>
+const checkLatestVersion = (): Promise<UserType> =>
   new Promise((resolve, reject) => {
     request
       .api()
@@ -15,7 +15,7 @@ const checkLtestVersion = (): Promise<UserType> =>
   });
 
 const applicationVersions = {
-  checkLtestVersion,
+  checkLatestVersion,
 };
 
 export default applicationVersions;

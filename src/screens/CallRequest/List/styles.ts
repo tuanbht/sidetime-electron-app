@@ -3,8 +3,11 @@ import { ButtonStyleType } from "../../../types/components/Button";
 import theme from "../../../constants/theme";
 
 export const StyledContainer = styled.div`
-  padding: 35px 40px 135px 70px;
+  box-sizing: border-box;
+  width: 1280px;
   height: 100vh;
+  padding: 35px 40px 135px 70px;
+  margin: auto;
   background-color: ${({ theme: { palette } }) => palette.grey10};
 `;
 
@@ -12,6 +15,7 @@ export const WelcomeContainer = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: space-between;
 `;
 export const TabsContainer = styled.div`
   display: flex;
@@ -19,13 +23,17 @@ export const TabsContainer = styled.div`
   margin-top: 32px;
 `;
 
+export const LeftWelcomeContainer = styled.div`
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+`;
+
 export const RightActionsMenuContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  position: absolute;
-  right: 40px;
-  background-color: ${({ theme: { palette } }) => palette.grey100};
+  position: relative;
 `;
 export const TabContainer = styled.div`
   padding-bottom: 50px;
@@ -41,7 +49,7 @@ export const Logo = styled.img`
 
 export const Avatar = styled.img`
   height: 48px;
-  widht: 48px;
+  width: 48px;
   border-radius: 24px;
 `;
 
@@ -75,6 +83,14 @@ export const welcomeMessageTypographyStyles = css`
   margin-left: 25px;
 `;
 
+export const currentSiteTypographyStyles = css`
+  font-size: 16px;
+  line-height: 16px;
+  font-family: ${({ theme: { fonts } }): string => fonts.neuzeitGrotesk};
+  color: ${({ theme: { palette } }) => palette.slateGrey};
+  margin-left: 25px;
+`;
+
 export const tabSectionNameTypographyStyles = css`
   display: block;
   margin-top: 40px;
@@ -99,8 +115,8 @@ export const verticalDividerStyles = css`
 
 export const actionMenuStyles = css`
   position: absolute;
-  right: 0px;
-  top: 60px;
+  right: 32px;
+  top: 48px;
 `;
 
 export const refreshButtonStyles = css<ButtonStyleType>`

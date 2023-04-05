@@ -4,6 +4,7 @@ const {
   ipcMain,
   systemPreferences,
   protocol,
+  globalShortcut,
 } = require("electron");
 const { openSystemPreferences } = require("electron-util");
 const path = require("path");
@@ -38,6 +39,7 @@ const createWindow = () => {
     height: 720,
     webPreferences: {
       preload: path.resolve(__dirname, "electron-preload.js"),
+      devTools: isDev,
     },
   });
   mainWindow.setMenu(null);
@@ -57,6 +59,20 @@ const createWindow = () => {
   }
   app.setAsDefaultProtocolClient("sidetime");
   mainWindow.on("closed", () => (mainWindow = null));
+
+  mainWindow.webContents.on("did-fail-load", () => {
+    log("did-fail-load");
+
+    if (!isDev) {
+      mainWindow.loadURL(
+        url.format({
+          pathname: "index.html",
+          protocol: "file",
+          slashes: true,
+        })
+      );
+    }
+  });
 
   const deepLink = openedURL || process.argv[1];
   ipcMain.on("ready-for-deep-link", () => {
@@ -107,6 +123,7 @@ app.on("open-url", (event, url) => {
   event.preventDefault();
   openedURL = url;
   log("open-url# " + url);
+  mainWindow && mainWindow.webContents.send("deep-link", openedURL);
 });
 
 app.on("ready", () => {
@@ -124,3 +141,17 @@ app.on("ready", () => {
 });
 app.on("activate", () => !mainWindow && createWindow());
 app.on("window-all-closed", () => app.quit());
+
+app.on("browser-window-focus", function () {
+  globalShortcut.register("CommandOrControl+R", () => {
+    console.log("CommandOrControl+R is pressed: Shortcut Disabled");
+  });
+  globalShortcut.register("F5", () => {
+    console.log("F5 is pressed: Shortcut Disabled");
+  });
+});
+
+app.on("browser-window-blur", function () {
+  globalShortcut.unregister("CommandOrControl+R");
+  globalShortcut.unregister("F5");
+});

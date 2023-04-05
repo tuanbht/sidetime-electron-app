@@ -36,6 +36,21 @@ class AuthStore implements AuthStoreType {
     });
   };
 
+  public signInWithToken = async (token: string): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      api.sessions
+        .signInWithToken(token)
+        .then((response) => {
+          runInAction(() => (this.currentUser = response));
+          resolve();
+        })
+        .catch((err) => {
+          reject(err);
+          this.currentUser = null;
+        });
+    });
+  };
+
   public logout = async (): Promise<void> => {
     runInAction(() => (this.currentUser = null));
   };

@@ -1,48 +1,40 @@
+export type MembershipType = {
+  id: number;
+  name: string;
+  site: SiteType;
+}
+
 export type UserType = {
   id: string;
   name: string;
   email: string;
-  avatar_url: string;
+  avatarUrl: string;
   location: string;
   timezone: string;
   headline: string;
   organization: string;
   bio: string;
-  token: string;
-  expert_profile:
-    | {
-        id: string;
-        slug: string;
-        status: string;
-        flexible_schedule: boolean;
-        tags: string[];
-        keywords: string[];
-        years_of_experience: number;
-        price_cents: number;
-        minimum_time_in_minutes: number;
-        profile_visibility: string;
-        featured: boolean;
-        known_for: string;
-        approved_at: null;
-      }
-    | undefined;
+  token?: string;
+  memberships: MembershipType[]
 };
 
 export type SiteType = {
   id: number;
   name: string;
+  rootDomain?: string;
+  slug?: string;
 };
 
 export type ExpertType = {
   id: number;
   name: string;
-  avatar_url: string;
+  avatarUrl: string;
 };
 
 export type RequesterType = {
   id: number;
   name: string;
-  avatar_url: string;
+  avatarUrl: string;
 };
 
 export type MessageType = {

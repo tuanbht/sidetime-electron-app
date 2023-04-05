@@ -9,6 +9,7 @@ import ActionMenuIcon from "./ActionMenuItem";
 import { ActionsMenuPropsType } from "../../types/components/ActionsMenu";
 import { StyledContainer } from "./styles";
 import useAppContext from "../../hooks/useAppContext";
+import { Repeat } from "react-feather";
 
 export interface ActionsMenuInterface {
   open: () => void;
@@ -19,7 +20,7 @@ const ActionsMenu: ForwardRefRenderFunction<
   ActionsMenuInterface,
   ActionsMenuPropsType
 > = ({ css }, ref) => {
-  const { authStore } = useAppContext();
+  const { authStore, userStore, siteStore } = useAppContext();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isHovering, setIsHovering] = useState<boolean>(false);
 
@@ -42,8 +43,18 @@ const ActionsMenu: ForwardRefRenderFunction<
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
+      {
+        userStore.memberships?.length && userStore.memberships.map(({ site }) => (
+          <ActionMenuIcon
+            key={site.id}
+            iconElement={<Repeat />}
+            text={site.name}
+            onClick={() => siteStore.setCurrentSite(site)}
+          />
+        ))
+      }
       <ActionMenuIcon
-        icon={logoutIcon}
+        iconSrc={logoutIcon}
         text="Logout"
         onClick={() => authStore.logout()}
       />

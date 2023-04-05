@@ -8,7 +8,6 @@ import {
 } from "react-feather";
 import { v4 as uuidv4 } from "uuid";
 import { ReactComponent as Refund } from "../../../assets/refund.svg";
-import { ReactComponent as MessageCircleOff } from "../../../assets/comments-off-grey.svg";
 import { CallRequestType, UserType } from "../../../types/models";
 import {
   isExpertPerspective,
@@ -180,7 +179,7 @@ export const HIDE_CALL_COMMENTS_BUTTON = {
   render: (onClick: () => void) => (
     <Button
       key={uuidv4()}
-      icon={<MessageCircleOff style={actionIconStyles} />}
+      icon={<MessageCircle size={16} style={actionIconStyles} />}
       onClick={onClick}
       css={actionButtonStyles}
     />

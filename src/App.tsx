@@ -9,7 +9,7 @@ import { observer } from "mobx-react-lite";
 import api from "./services/api";
 
 const App: React.FC = () => {
-  const { authStore, deeplinkStore, setIsLoading, isLoading } = useAppContext();
+  const { authStore, deeplinkStore, setIsLoading, isLoading, notificationStore } = useAppContext();
   const onLinkReceived = useCallback(
     async (_event: IpcRendererEvent, link: string) => {
       const parsed = parseDeepLink(link);
@@ -18,14 +18,20 @@ const App: React.FC = () => {
         setIsLoading(false);
         return;
       }
-
       setIsLoading(true);
-      await authStore.logout();
-      await deeplinkStore.setDeeplink(parsed);
-      await authStore.login({ token: parsed.token });
-      setIsLoading(false);
+
+      try {
+        await authStore.logout();
+        await deeplinkStore.setDeeplink(parsed);
+        await authStore.signInWithToken(parsed.token);
+      } catch (e) {
+        notificationStore.setErrorNotification('Invalid token');
+      }
+      finally {
+        setIsLoading(false);
+      }
     },
-    [authStore, deeplinkStore, setIsLoading],
+    [authStore, deeplinkStore, notificationStore, setIsLoading],
   );
 
   useEffect(() => {
@@ -38,17 +44,13 @@ const App: React.FC = () => {
   }, [onLinkReceived]);
 
   useEffect(() => {
-    authStore.login({ token: authStore.currentUser?.token }).catch(() => {
-      authStore.logout();
-    });
-
-    api.applicationVersions.checkLtestVersion().catch((error) => {
+    api.applicationVersions.checkLatestVersion().catch((error) => {
       alert(
         error?.data?.message ||
           "Error while checking latest version from Sidetime app. Please restart again",
       );
     });
-  }, [authStore]);
+  }, []);
 
   if (isLoading) return null;
   return (

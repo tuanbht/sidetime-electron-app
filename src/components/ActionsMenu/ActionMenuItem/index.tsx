@@ -8,13 +8,15 @@ import {
 } from "./styles";
 
 const ActionMenuItem: React.FC<ActionsMenuItemPropsType> = ({
-  icon,
+  iconSrc,
+  iconElement,
   text,
   onClick,
 }) => {
   return (
     <StyledContainer onClick={onClick}>
-      <ActionMenuIcon src={icon} />
+      {iconElement}
+      {iconSrc && <ActionMenuIcon src={iconSrc} />}
       <Typography
         variant="regular"
         text={text}

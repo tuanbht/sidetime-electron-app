@@ -11,6 +11,13 @@ const REQUEST_INTERCEPTORS = {
         "Authorization"
       ] = `Bearer ${authStore.currentUser?.token}`;
     }
+
+    const apiUrl = config?.url || '';
+
+    if (!apiUrl.startsWith('/api/v1')) {
+      config.headers['Key-Inflection'] = 'camel'
+    }
+
     return config;
   },
 };
@@ -19,7 +26,12 @@ export const request = {
   api: () => {
     const instance = axios.create({
       baseURL: process.env.REACT_APP_API_URL,
-      timeout: 5000,
+      // FIXME: Add Key-Inflection config when migrated all APIs
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+
     });
 
     instance.interceptors.request.use(REQUEST_INTERCEPTORS.auth);
