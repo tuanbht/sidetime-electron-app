@@ -35,8 +35,7 @@ const DeclineCallModal: React.FC = () => {
       callRequestStore
         .setCallRequestAsDeclined(callRequest)
         .then((response) => {
-          // TODO: Replace call request with new response for new serializers
-          updateCallRequest(callRequest);
+          updateCallRequest(response);
           modalContext.close();
           notificationStore.setSuccessNotification("Call marked as declined");
         })

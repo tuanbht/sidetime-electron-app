@@ -54,8 +54,7 @@ const RescheduleCallModal: React.FC = () => {
         replyUserId: currentUser?.id,
       })
         .then((response) => {
-          // TODO: Replace call request with new response for new serializers
-          updateCallRequest(callRequest);
+          updateCallRequest(response);
           notificationStore.setSuccessNotification(
             "Call rescheduling request sent."
           );

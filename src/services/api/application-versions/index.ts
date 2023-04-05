@@ -5,7 +5,7 @@ const checkLatestVersion = (): Promise<UserType> =>
   new Promise((resolve, reject) => {
     request
       .api()
-      .get("/api/v1/application_versions/check_latest_version", {
+      .get("/api/application_versions/check_latest_version", {
         params: {
           version: process.env.REACT_APP_VERSION,
         },

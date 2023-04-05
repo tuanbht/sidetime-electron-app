@@ -1,14 +1,8 @@
-type ListCallsPaginationType = {
-  total: number;
-  totalPage: number;
-  page: number;
-  pageSize: number;
-}
-
 export type MembershipType = {
   id: number;
   name: string;
   site: SiteType;
+  slug: string;
 }
 
 export type UserType = {
@@ -52,6 +46,7 @@ export type CallRequestType = {
   id: number;
   requesterId: number;
   bundleRequestId: number | null;
+  siteSlug: string;
   otherUser: OtherUserType;
   callTypeName: string;
   comments: CommentType[];
@@ -63,7 +58,6 @@ export type CallRequestType = {
   totalCost: number;
   proposedTimes: string[];
   scheduledAt: string;
-  site: SiteType;
   slug: string;
   status:
     | "live"
@@ -78,7 +72,7 @@ export type CallRequestType = {
     | "incomplete"
     | "pending_connection"
     | "missed";
-  updated_at: string;
+  updatedAt: string;
   communicateVia: "audio" | "videoconference" | "in_person_meeting";
   refundable: boolean;
   expertStatus:
@@ -91,6 +85,13 @@ export type CallRequestType = {
 export type TokenType = {
   token: string;
 };
+
+export type ListCallsPaginationType = {
+  total: number;
+  totalPage: number;
+  page: number;
+  pageSize: number;
+}
 
 export type UpcomingCallRequestsType = {
   pagination: ListCallsPaginationType,

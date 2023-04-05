@@ -8,15 +8,10 @@ export type CreateCommentRequestType = {
 };
 
 export type StorePublicInterface = {
-  fetchComments: (callRequest: CallRequestType) => Promise<CommentType[]>;
   createComment: (
     callRequest: CallRequestType,
     params: CreateCommentRequestType
-  ) => Promise<CommentType>;
-  destroyComment: (
-    callRequest: CallRequestType,
-    comment: CommentType
-  ) => Promise<CommentType>;
+  ) => Promise<CommentType[]>;
   initCommentsForCallRequest: (callRequest: CallRequestType) => void;
 };
 

@@ -3,7 +3,7 @@ import { CallRequestType } from "../models";
 
 export type StoreProperties = {
   callRequest: CallRequestType | undefined;
-  pastCallRequests: CallRequestType[] | undefined;
+  pastCallRequests: PastCallRequestsType | undefined;
   upcomingCallRequests: UpcomingCallRequestsType | undefined;
 };
 
@@ -29,9 +29,9 @@ export type CallRequestTwilioTokenType = {
 };
 
 export type StorePublicInterface = {
-  fetchCurrentCallRequests: () => Promise<UpcomingCallRequestsType>;
-  fetchPastCallRequests: () => Promise<PastCallRequestsType>;
-  fetchCallRequest: (id: string) => Promise<CallRequestType>;
+  fetchCurrentCallRequests: (page?: number) => Promise<UpcomingCallRequestsType>;
+  fetchPastCallRequests: (page?: number) => Promise<PastCallRequestsType>;
+  fetchCallRequest: (siteSlug: string, id: string) => Promise<CallRequestType>;
   updateCallRequest: (
     callRequest: CallRequestType,
     params: UpdateCallRequestType

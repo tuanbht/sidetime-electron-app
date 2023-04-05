@@ -13,17 +13,19 @@ export const parseDeepLink = (deepLink: string): ParsedDeepLinkType => {
     const parsed = qs.parse(url.search);
 
     return {
-      call_request_id: sanitizeToken(parsed["call_request_id"]),
+      siteSlug: sanitizeToken(parsed["site_slug"]),
+      callRequestSlug: sanitizeToken(parsed["call_request_slug"]),
       token: sanitizeToken(parsed["token"]),
       action: url.pathname,
       protocol: url.protocol,
     };
   } catch (error) {
     return {
+      siteSlug: undefined,
       token: undefined,
       protocol: undefined,
       action: undefined,
-      call_request_id: undefined,
+      callRequestSlug: undefined,
     };
   }
 };

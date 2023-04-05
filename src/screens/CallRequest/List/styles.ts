@@ -38,6 +38,10 @@ export const RightActionsMenuContainer = styled.div`
 export const TabContainer = styled.div`
   padding-bottom: 50px;
 `;
+export const ListCallsContainer = styled.div`
+  margin-bottom: 24px;
+`;
+
 export const RightActionsMenu = styled.div``;
 export const RightActionsMenuItem = styled.div``;
 

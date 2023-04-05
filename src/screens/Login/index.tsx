@@ -40,8 +40,8 @@ const LoginScreen: React.FC = () => {
     if (!authStore.checkLoggedInUser()) return;
     const { deeplink } = deeplinkStore;
 
-    if (deeplink?.call_request_id) {
-      history.push(`/call_requests/${deeplink.call_request_id}`);
+    if (deeplink?.callRequestSlug && deeplink?.siteSlug) {
+      history.push(`/${deeplink.siteSlug}/call_requests/${deeplink.callRequestSlug}`);
       deeplinkStore.clearDeeplink();
     } else history.push("/call_requests");
   }, [history, authStore, deeplinkStore, authStore.currentUser]);

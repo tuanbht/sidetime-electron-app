@@ -33,8 +33,7 @@ const RefundCallModal: React.FC = () => {
       callRequestStore
         .setCallRequestAsRefunded(callRequest)
         .then((response) => {
-          // TODO: Replace call request with new response for new serializers
-          updateCallRequest(callRequest);
+          updateCallRequest(response);
           const message = `You have successfully refunded the call with ${callRequest.otherUser.name}`;
           notificationStore.setSuccessNotification(message);
           modalContext.close();

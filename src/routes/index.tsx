@@ -12,7 +12,7 @@ const AppRouter: React.FC = () => {
         <ProtectedRoute path="/call_requests" exact>
           <CallRequestListScreen />
         </ProtectedRoute>
-        <ProtectedRoute path="/call_requests/:id" exact>
+        <ProtectedRoute path="/:siteSlug/call_requests/:slug" exact>
           <CallRequestSessionScreen />
         </ProtectedRoute>
         <Route path="/">

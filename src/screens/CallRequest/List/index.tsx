@@ -36,11 +36,14 @@ import {
   refreshIconStyles,
   currentSiteTypographyStyles,
   LeftWelcomeContainer,
+  ListCallsContainer,
 } from "./styles";
+import ListCallsPagination from "../../../components/ListCallsPagination";
 
 const CallRequestListScreen: React.FC<CallRequestListScreenPropsType> = () => {
   const [tab, setTab] = useState<string>("upcoming");
   const menuRef = useRef<ActionsMenuInterface>(null);
+  const listCallsRef = useRef<HTMLDivElement>(null);
   const {
     authStore: { currentUser },
     callRequestStore,
@@ -57,6 +60,14 @@ const CallRequestListScreen: React.FC<CallRequestListScreenPropsType> = () => {
       fetchingCallsPromise.finally(() => refreshButtonForm.setSubmitting(false));
     },
   });
+
+  useEffect(() => {
+    callRequestStore.fetchCurrentCallRequests();
+  }, [callRequestStore]);
+
+  useEffect(() => {
+    callRequestStore.fetchPastCallRequests();
+  }, [callRequestStore, currentSite]);
 
   const renderTabLabel = (id: string, name: string) => {
     return (
@@ -110,42 +121,47 @@ const CallRequestListScreen: React.FC<CallRequestListScreenPropsType> = () => {
     return section;
   };
 
-  useEffect(() => {
-    callRequestStore.fetchCurrentCallRequests();
-  }, [callRequestStore]);
-
-  useEffect(() => {
-    callRequestStore.fetchPastCallRequests();
-  }, [callRequestStore, currentSite]);
+  const scrollToTopOfList = () => listCallsRef.current?.scrollIntoView({ behavior: 'smooth' });
 
   const upcommingTab = useMemo(() => {
     if (!upcomingCallRequests) return [];
 
-    const { requiresResponse, pending, scheduled, completed } = upcomingCallRequests.data
+    const { requiresResponse, pending, scheduled, completed } = upcomingCallRequests.data;
+    const onChangePage = (page: number) => callRequestStore.fetchCurrentCallRequests(page).then(scrollToTopOfList);
 
-    return [
-      ...[
-        requiresResponse
-          ? renderTabSection("PENDING YOUR CONFIRMATION", requiresResponse)
-          : null,
-      ],
-      ...renderTabSection("SCHEDULED", scheduled, NO_SCHEDULED_CALLS),
-      ...renderTabSection("PENDING CONFIRMATION", pending, NO_PENDING_CALLS),
-      ...[
-        completed
-          ? renderTabSection("COMPLETED", completed)
-          : null,
-      ],
-    ];
-  }, [upcomingCallRequests]);
+    return <>
+      <ListCallsContainer>
+        { requiresResponse && renderTabSection("PENDING YOUR CONFIRMATION", requiresResponse) }
+        { renderTabSection("SCHEDULED", scheduled, NO_SCHEDULED_CALLS) }
+        { renderTabSection("PENDING CONFIRMATION", pending, NO_PENDING_CALLS) }
+        { completed && renderTabSection("COMPLETED", completed) }
+      </ListCallsContainer>
+      <ListCallsPagination
+        pagination={upcomingCallRequests.pagination}
+        onChangePage={onChangePage}
+      />
+    </>
+
+  }, [callRequestStore, upcomingCallRequests]);
 
   const historyTab = useMemo(() => {
-    return (pastCallRequests || []).map((callRequest) => <CallRequestListItem callRequest={callRequest} key={callRequest.id} />);
-  }, [pastCallRequests]);
+    const onChangePage = (page: number) => callRequestStore.fetchPastCallRequests(page).then(scrollToTopOfList);
+
+    return pastCallRequests && <>
+      <ListCallsContainer>
+        {(pastCallRequests.data || []).map((callRequest) => <CallRequestListItem callRequest={callRequest} key={callRequest.id} />)}
+      </ListCallsContainer>
+      <ListCallsPagination
+        pagination={pastCallRequests.pagination}
+        onChangePage={onChangePage}
+      />
+    </>
+    ;
+  }, [callRequestStore, pastCallRequests]);
 
   // TODO: Integrate completed calls
   return (
-    <StyledContainer>
+    <StyledContainer ref={listCallsRef}>
       <WelcomeContainer>
         <LeftWelcomeContainer>
           <Logo src={logo} />

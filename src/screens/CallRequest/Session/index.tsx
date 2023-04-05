@@ -91,12 +91,12 @@ const CallRequestSessionScreen: React.FC<CallRequestSessionScreenPropsType> = (
   }, [history, unpublishTracksAndDisconnect]);
 
   useEffect(() => {
-    if (!params.id) return;
+    if (!params.slug) return;
 
-    callRequestStore.fetchCallRequest(params.id).then((callRequest) => {
+    callRequestStore.fetchCallRequest(params.siteSlug, params.slug).then((callRequest) => {
       setCallRequest(callRequest);
     });
-  }, [callRequestStore, params.id]);
+  }, [callRequestStore, params.slug, params.siteSlug]);
 
   useEffect(() => {
     if (!callRequest || room !== undefined) return;
