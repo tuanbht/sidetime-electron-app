@@ -114,7 +114,7 @@ const CallRequestListScreen: React.FC<CallRequestListScreenPropsType> = () => {
     section = [
       ...section,
       ...callRequests.map((e) => (
-        <CallRequestListItem callRequest={e} key={e.id} />
+        <CallRequestListItem callRequest={e} key={e.id} belongsToTab="upcoming"/>
       )),
     ];
 
@@ -149,7 +149,9 @@ const CallRequestListScreen: React.FC<CallRequestListScreenPropsType> = () => {
 
     return pastCallRequests && <>
       <ListCallsContainer>
-        {(pastCallRequests.data || []).map((callRequest) => <CallRequestListItem callRequest={callRequest} key={callRequest.id} />)}
+        {(pastCallRequests.data || []).map((callRequest) =>
+          <CallRequestListItem callRequest={callRequest} key={callRequest.id} belongsToTab="history" />
+        )}
       </ListCallsContainer>
       <ListCallsPagination
         pagination={pastCallRequests.pagination}

@@ -102,6 +102,10 @@ const createWindow = () => {
   });
 
   log("deeplink url: " + deepLink);
+
+  ipcMain.on("openExternalUrl", (_, url) => {
+    require("electron").shell.openExternal(url);
+  });
 };
 
 const lock = app.requestSingleInstanceLock();

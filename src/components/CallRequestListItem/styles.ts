@@ -71,6 +71,15 @@ export const liveLabelTypographyStyles = css`
   color: ${({ theme: { palette } }): string => palette.white};
   background-color: ${({ theme: { palette } }): string => palette.orangish};
 `;
+export const callViaLabelStyles = css`
+  text-transform: capitalize;
+  width: 68px;
+  background-color: ${({ theme: { palette } }): string => palette.orangish };
+`;
+
+export const callViaSystemStyles = css`
+  background-color: ${({ theme: { palette } }): string => palette.darkGrey };
+`
 
 export const declinedCanceledLabelTypographyStyles = css`
   font-size: 14px;
@@ -131,3 +140,18 @@ export const callIconStyles: React.CSSProperties = {
   marginRight: "6px",
   color: theme.palette.slateGrey,
 };
+
+export const callRequestSiteStyles = css`
+  padding: unset;
+  margin: auto;
+  margin-bottom: 18px;
+  height: unset;
+  background-color: unset;
+  &:hover {
+    background-color: unset;
+  }
+`;
+
+export const SiteLogo = styled.img`
+  height: 32px;
+`;

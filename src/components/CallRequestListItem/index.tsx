@@ -67,13 +67,20 @@ import {
   declinedCanceledLabelTypographyStyles,
   labelTypographStyles,
   messagesTypographyStyles,
+  callRequestSiteStyles,
+  callViaLabelStyles,
+  callViaSystemStyles,
+  SiteLogo,
 } from "./styles";
 import { CallRequestType } from "../../types/models";
 import { CallRequestItemContextProvider } from "../../contexts/CallRequestItemContext";
 import RefundCallModal from "./RefundCallModal";
+import ElectronWindow from '../../utils/window';
+import Button from "../Button";
 
 const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
   callRequest: initCallRequest,
+  belongsToTab
 }) => {
   const markAsCompleteModalRef = useRef<ModalInterface>(null);
   const rescheduleCallRef = useRef<ModalInterface>(null);
@@ -158,7 +165,7 @@ const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
     const onFinishButtonClick = () => markAsCompleteModalRef.current?.open();
     const onShowCommentsButtonClick = () => toggleComments(true);
     const onHideCommentsButtonClick = () => toggleComments(false);
-    const onJoinCallButtonClick = () => history.push(`/${callRequest.siteSlug}/call_requests/${callRequest.slug}`);
+    const onJoinCallButtonClick = () => history.push(`/${callRequest.site.slug}/call_requests/${callRequest.slug}`);
     const onAcceptTimeButtonClick = () => {
       acceptTimeForm.handleSubmit();
     };
@@ -192,6 +199,12 @@ const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
     return actions;
   };
 
+  const onClickExternal = () => {
+    const { rootDomain, slug } = callRequest.site;
+    const siteUrl = `https://${rootDomain}/${slug}`;
+    ElectronWindow.ipc.send('openExternalUrl', siteUrl);
+  }
+
   return (
     <StyledContainer>
       <CallRequestItemContextProvider callRequest={callRequest} updateCallRequest={setCallRequest}>
@@ -199,6 +212,9 @@ const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
           <CalendarIcon timestamp={timestamp.toString()} />
         </LeftContainer>
         <RightContainer>
+          {belongsToTab === 'upcoming' &&
+            <Button onClick={onClickExternal} icon={<SiteLogo src={callRequest.site.logoUrl} />} css={callRequestSiteStyles} />
+          }
           <InfoContainer>
             <ExpertContainer>
               <CallNameContainer>
@@ -210,6 +226,11 @@ const CallRequestListItem: React.FC<CallRequestListItemPropsType> = ({
                     currentUser
                   )}`}
                   css={callNameTypographyStyles}
+                />
+                <Typography
+                    variant="bold"
+                    text={callRequest.callVia}
+                    css={[liveLabelTypographyStyles, callViaLabelStyles, callRequest.callVia === 'system' && callViaSystemStyles]}
                 />
                 {[CALL_REQUEST_LIVE, CALL_REQUEST_PAUSED].includes(status) ? (
                   <Typography

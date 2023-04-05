@@ -83,7 +83,7 @@ class CallRequestStore implements CallRequestStoreType {
   ): Promise<CallRequestType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
-        .update(callRequest.siteSlug, callRequest.id, params)
+        .update(callRequest.site.slug, callRequest.id, params)
         .then((callRequest) => {
           resolve(callRequest);
         })
@@ -97,7 +97,7 @@ class CallRequestStore implements CallRequestStoreType {
   ): Promise<CallRequestType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
-        .accept(callRequest.siteSlug, callRequest.id, scheduledAt)
+        .accept(callRequest.site.slug, callRequest.id, scheduledAt)
         .then((callRequest) => {
           resolve(callRequest);
         })
@@ -110,7 +110,7 @@ class CallRequestStore implements CallRequestStoreType {
   ): Promise<CallRequestType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
-        .decline(callRequest.siteSlug, callRequest.id)
+        .decline(callRequest.site.slug, callRequest.id)
         .then((callRequest) => {
           resolve(callRequest);
         })
@@ -124,7 +124,7 @@ class CallRequestStore implements CallRequestStoreType {
   ): Promise<CallRequestType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
-        .cancel(callRequest.siteSlug, callRequest.id, params)
+        .cancel(callRequest.site.slug, callRequest.id, params)
         .then((callRequest) => {
           resolve(callRequest);
         })
@@ -137,7 +137,7 @@ class CallRequestStore implements CallRequestStoreType {
   ): Promise<CallRequestType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
-        .finish(callRequest.siteSlug, callRequest.id)
+        .finish(callRequest.site.slug, callRequest.id)
         .then((callRequest) => {
           resolve(callRequest);
         })
@@ -150,7 +150,7 @@ class CallRequestStore implements CallRequestStoreType {
   ): Promise<CallRequestType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
-        .refund(callRequest.siteSlug, callRequest.id)
+        .refund(callRequest.site.slug, callRequest.id)
         .then((callRequest) => {
           resolve(callRequest);
         })
@@ -163,7 +163,7 @@ class CallRequestStore implements CallRequestStoreType {
   ): Promise<CallRequestType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
-        .start(callRequest.siteSlug, callRequest.id)
+        .start(callRequest.site.slug, callRequest.id)
         .then((callRequest) => {
           resolve(callRequest);
         })
@@ -176,7 +176,7 @@ class CallRequestStore implements CallRequestStoreType {
   ): Promise<CallRequestType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
-        .pause(callRequest.siteSlug, callRequest.id)
+        .pause(callRequest.site.slug, callRequest.id)
         .then((callRequest) => {
           resolve(callRequest);
         })
@@ -190,7 +190,7 @@ class CallRequestStore implements CallRequestStoreType {
   ): Promise<CallRequestType> => {
     return new Promise((resolve, reject) => {
       api.callRequests
-        .bounce(callRequest.siteSlug, callRequest.id, params)
+        .bounce(callRequest.site.slug, callRequest.id, params)
         .then((callRequest) => {
           resolve(callRequest);
         })
@@ -204,7 +204,7 @@ class CallRequestStore implements CallRequestStoreType {
     return new Promise((resolve, reject) => {
       const call = this.callRequest || callRequest;
       const currentUser = this.rootStore?.authStore?.currentUser;
-      const siteSlug = call?.siteSlug;
+      const siteSlug = call?.site.slug;
 
       if (!call || !currentUser || !siteSlug) {
         reject("No call request provided");
@@ -212,7 +212,7 @@ class CallRequestStore implements CallRequestStoreType {
       }
 
       const token: CallRequestTwilioTokenType = {
-        identity: currentUser.name,
+        identity: `${currentUser.name} - ${currentUser.id}`,
         room: call.slug,
       };
 
