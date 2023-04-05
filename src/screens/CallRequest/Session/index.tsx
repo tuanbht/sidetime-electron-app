@@ -128,14 +128,15 @@ const CallRequestSessionScreen: React.FC<CallRequestSessionScreenPropsType> = (
         />
         <Logo src={logo} />
       </LogoContainer>
-      {remoteParticipant ? (
+      {remoteParticipant && (
         <RemoteParticipant
           participant={remoteParticipant}
           callRequest={callRequest}
         />
-      ) : null}
+      )}
       <LocalParticipant
         participant={localParticipant}
+        counterpart={remoteParticipant}
         callRequest={callRequest}
         countdownRef={countdownRef}
         onCallEnded={onEndCallButtonClick}

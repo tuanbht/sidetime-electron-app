@@ -29,6 +29,11 @@ export const ButtonContainer = styled.button<ButtonStyleType>`
   }
   ${(props: ButtonStyleType): CSSProp => props.css || ""}
   cursor: pointer;
+
+  &:disabled {
+    cursor: unset;
+    pointer-events: none;
+  }
 `;
 
 export const buttonTextTypographyStyles = css`

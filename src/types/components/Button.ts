@@ -10,5 +10,5 @@ export type ButtonPropsType = ButtonStyleType & {
   icon?: React.ReactElement;
   isLoading?: boolean;
   buttonTextCss?: CSSProp;
-  onClick: () => void;
+  onClick?: () => void;
 };
