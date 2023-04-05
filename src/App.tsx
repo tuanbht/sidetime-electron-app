@@ -47,7 +47,7 @@ const App: React.FC = () => {
     api.applicationVersions.checkLatestVersion().catch((error) => {
       alert(
         error?.data?.message ||
-          "Error while checking latest version from Sidetime app. Please restart again",
+          "Error while checking latest version from Sidetime app. Please restart again or download the latest version at https://sidetime.com/download-app.",
       );
     });
   }, []);
