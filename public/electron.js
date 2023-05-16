@@ -43,7 +43,6 @@ const createWindow = () => {
     },
   });
   mainWindow.setMenu(null);
-
   if (isDev) {
     mainWindow.setPosition(0, 0);
     mainWindow.loadURL("http://localhost:3000");
@@ -130,7 +129,7 @@ app.on("open-url", (event, url) => {
   mainWindow && mainWindow.webContents.send("deep-link", openedURL);
 });
 
-app.on("ready", () => {
+app.whenReady().then(() => {
   protocol.interceptFileProtocol(
     "file",
     (request, callback) => {
@@ -143,6 +142,7 @@ app.on("ready", () => {
   );
   createWindow();
 });
+
 app.on("activate", () => !mainWindow && createWindow());
 app.on("window-all-closed", () => app.quit());
 
