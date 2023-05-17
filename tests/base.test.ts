@@ -1,24 +1,27 @@
-import { _electron as electron } from "playwright";
-import { test, expect, ElectronApplication, Page } from "@playwright/test";
+import { buildElectronApp } from "./configurations/globalTest";
+import { test, expect } from "@playwright/test";
+import { ElectronApplication } from "playwright-core";
 
-test.describe("Check Man Page", async () => {
-  let electronApp: ElectronApplication;
-  let firstWindow: Page;
+let electronApp: ElectronApplication;
 
-  test.beforeAll(async () => {
-    electronApp = await electron.launch({
-      args: ['.'],
-      executablePath: 'dist/mac/Sidetime.app/Contents/MacOS/Sidetime'
-    });
-    firstWindow = await electronApp.firstWindow();
-  });
+test.beforeAll(async () => {
+  electronApp = await buildElectronApp();
+});
 
-  test("landing page", async () => {
-    await expect(firstWindow).toHaveTitle('Sidetime');
-  });
+test.afterAll(() => {
+  electronApp.close();
+});
 
+test.describe("Sign in as user", async () => {
+  test("user perspective", async () => {
+    const page = await electronApp.firstWindow();
 
-  test.afterAll(async () => {
-    await electronApp.close();
+    await expect(
+      page.getByText("Please sign in to continue.")
+    ).toBeInViewport();
+
+    await page.getByPlaceholder("Your email").fill("user@example.com");
+    await page.getByPlaceholder("Your password").fill("password");
+    await page.getByRole("button", { name: "SIGN IN" }).click();
   });
 });

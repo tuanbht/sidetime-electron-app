@@ -22,6 +22,7 @@
     "dayjs": "^1.10.3",
     "dotenv": "^8.2.0",
     "electron-is-dev": "^1.2.0",
+    "electron-playwright-helpers": "^1.5.4",
     "electron-util": "^0.15.0",
     "formik": "^2.2.6",
     "mobx": "^6.0.4",
@@ -106,9 +107,9 @@
     "styled-components": "^5"
   },
   "author": {
-    "name": "StartupLandia LLC",
-    "email": "hello@startuplandia.io",
-    "url": "https://www.startuplandia.io"
+    "name": "East Agile",
+    "email": "sidetime@eastagile.com",
+    "url": "https://eastagle.com"
   },
   "build": {
     "appId": "com.sidetime.app",
@@ -139,7 +140,6 @@
       "schemes": [
         "sidetime"
       ]
-    },
-    "afterSign": "scripts/notarize.js"
+    }
   }
 }
