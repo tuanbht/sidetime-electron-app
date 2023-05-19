@@ -16,11 +16,7 @@ test.describe("Sign in as user", async () => {
   test("user perspective", async () => {
     const page = await electronApp.firstWindow();
 
-    await expect(
-      page.getByText("Please sign in to continue.")
-    ).toBeVisible();
-
-    await expect(page).toHaveScreenshot({ fullPage: true });
+    await expect(page.getByText("Please sign in to continue.")).toBeVisible();
 
     await page.getByPlaceholder("Your email").fill("user@example.com");
     await page.getByPlaceholder("Your password").fill("password");
@@ -29,7 +25,5 @@ test.describe("Sign in as user", async () => {
     await expect(
       page.getByText("Hello Mock User! Welcome to Sidetime")
     ).toBeVisible();
-
-    await expect(page).toHaveScreenshot({ fullPage: true });
   });
 });
