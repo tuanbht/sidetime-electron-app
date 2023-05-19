@@ -1,5 +1,5 @@
 import { SiteStoreType } from "./../types/stores/SiteStore";
-import axios, { AxiosRequestConfig } from "axios";
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { AuthStoreType } from "../types/stores/AuthStore";
 
 const requestInterceptorConfig = (config: AxiosRequestConfig) => {
@@ -22,6 +22,12 @@ const requestInterceptorConfig = (config: AxiosRequestConfig) => {
   return config;
 };
 
+const responseInterceptorConfig = (response: AxiosResponse) => {
+  console.log("Response from url:", JSON.stringify(response));
+
+  return response;
+};
+
 export const request = {
   api: () => {
     const instance = axios.create({
@@ -35,6 +41,7 @@ export const request = {
     });
 
     instance.interceptors.request.use(requestInterceptorConfig);
+    instance.interceptors.response.use(responseInterceptorConfig);
     return instance;
   },
 };
