@@ -72,7 +72,9 @@ commands:
                 bundle exec rails db:create db:schema:load
                 bundle exec rails mockup_data:e2e_testing
                 bundle exec rails s -u puma -d -p 8080
-
+          - run:
+              name: Wait for backend
+              command: dockerize -wait localhost:8080 -timeout 1m
 jobs:
   test:
     executor: test-executor
@@ -88,9 +90,6 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: yarn electron-pack:linux --dir
       - run: sudo apt install libgtk-3-0
-      - run:
-          name: Wait for backend
-          command: curl localhost:8080
       - run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" -- npx playwright test
 
 workflows:
