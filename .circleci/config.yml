@@ -31,6 +31,7 @@ executors:
       DESKTOP_APP_VERION: 1.0.0
       SYSTEM_ACCESS_KEY: system-access-key
       REACT_APP_SYSTEM_ACCESS_KEY: system-access-key
+      DEBUG: pw:browser*
 
 commands:
   prepare-for-testing:
