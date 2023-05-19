@@ -18,7 +18,9 @@ test.describe("Sign in as user", async () => {
 
     await expect(
       page.getByText("Please sign in to continue.")
-    ).toBeInViewport();
+    ).toBeVisible();
+
+    await expect(page).toHaveScreenshot({ fullPage: true });
 
     await page.getByPlaceholder("Your email").fill("user@example.com");
     await page.getByPlaceholder("Your password").fill("password");
@@ -26,6 +28,8 @@ test.describe("Sign in as user", async () => {
 
     await expect(
       page.getByText("Hello Mock User! Welcome to Sidetime")
-    ).toBeInViewport();
+    ).toBeVisible();
+
+    await expect(page).toHaveScreenshot({ fullPage: true });
   });
 });

@@ -88,6 +88,9 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: yarn electron-pack:linux --dir
       - run: sudo apt install libgtk-3-0
+      - run:
+          name: Wait for backend
+          command: curl localhost:8080
       - run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" -- npx playwright test
 
 workflows:
