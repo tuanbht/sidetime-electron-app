@@ -53,7 +53,7 @@
     "tsc": "tsc --skipLibCheck",
     "format": "prettier --write '**/*.{ts,js,tsx,jsx,css,json,md,html,yml}' --ignore-path .gitignore",
     "electron": "concurrently \"BROWSER=none yarn start\" \"wait-on http://localhost:3000 && electron .\"",
-    "postinstall": "electron-builder install-app-deps",
+    "prebuild": "electron-builder install-app-deps",
     "preelectron-pack:linux": "yarn build",
     "preelectron-pack:windows": "yarn build",
     "preelectron-pack:macos": "yarn build",

@@ -28,15 +28,16 @@ executors:
       REACT_APP_VERSION: $npm_package_version
       REACT_APP_NAME: $npm_package_name
       E2E_TESTING: true
-      RAILS_ENV: test
       DESKTOP_APP_VERION: 1.0.0
+      SYSTEM_ACCESS_KEY: system-access-key
+      REACT_APP_SYSTEM_ACCESS_KEY: system-access-key
 
 commands:
   prepare-for-testing:
       steps:
           - run:
               name: Clone backend repository
-              command: git clone https://$GIT_ACCESS_TOKEN@github.com/makersource/mks-st2.git ~/backend
+              command: git clone --single-branch --branch 'issue#initial_data_for_e2e_testing' https://$GIT_ACCESS_TOKEN@github.com/makersource/mks-st2.git ~/backend
           - restore_cache:
               keys:
                 - &gem-cache gem-cache-v1-{{ arch }}-{{ .Branch }}-{{ checksum "~/backend/Gemfile.lock" }}
@@ -64,11 +65,11 @@ commands:
               name: Wait for Redis
               command: dockerize -wait tcp://localhost:6379 -timeout 1m
           - run:
-              # Integrate with task mockup_data:e2e_testing
               name: Run Backend Server
               command: |
                 cd ~/backend
                 bundle exec rails db:create db:schema:load
+                bundle exec rails mockup_data:e2e_testing
                 bundle exec rails s -u puma -d -p 8080
 
 jobs:

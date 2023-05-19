@@ -41,7 +41,9 @@ const LoginScreen: React.FC = () => {
     const { deeplink } = deeplinkStore;
 
     if (deeplink?.callRequestSlug && deeplink?.siteSlug) {
-      history.push(`/${deeplink.siteSlug}/call_requests/${deeplink.callRequestSlug}`);
+      history.push(
+        `/${deeplink.siteSlug}/call_requests/${deeplink.callRequestSlug}`
+      );
       deeplinkStore.clearDeeplink();
     } else history.push("/call_requests");
   }, [history, authStore, deeplinkStore, authStore.currentUser]);
@@ -68,12 +70,14 @@ const LoginScreen: React.FC = () => {
         <FormFieldsContainer>
           <Input
             label="Email"
+            placeholder="Your email"
             value={form.values.email || ""}
             error={form.errors.email || ""}
             onChange={(text) => form.setFieldValue("email", text)}
           />
           <Input
             label="Password"
+            placeholder="Your password"
             value={form.values.password || ""}
             error={form.errors.password || ""}
             onChange={(text) => form.setFieldValue("password", text)}

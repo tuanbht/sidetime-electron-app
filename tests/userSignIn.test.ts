@@ -23,5 +23,9 @@ test.describe("Sign in as user", async () => {
     await page.getByPlaceholder("Your email").fill("user@example.com");
     await page.getByPlaceholder("Your password").fill("password");
     await page.getByRole("button", { name: "SIGN IN" }).click();
+
+    await expect(
+      page.getByText("Hello Mock User! Welcome to Sidetime")
+    ).toBeInViewport();
   });
 });

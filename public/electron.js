@@ -39,11 +39,11 @@ const createWindow = () => {
     height: 720,
     webPreferences: {
       preload: path.resolve(__dirname, "electron-preload.js"),
-      devTools: isDev,
+      devTools: true,
     },
   });
   mainWindow.setMenu(null);
-  if (isDev) {
+  if (true) {
     mainWindow.setPosition(0, 0);
     mainWindow.loadURL("http://localhost:3000");
     mainWindow.webContents.openDevTools({ mode: "bottom" });

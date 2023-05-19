@@ -9,7 +9,13 @@ import { observer } from "mobx-react-lite";
 import api from "./services/api";
 
 const App: React.FC = () => {
-  const { authStore, deeplinkStore, setIsLoading, isLoading, notificationStore } = useAppContext();
+  const {
+    authStore,
+    deeplinkStore,
+    setIsLoading,
+    isLoading,
+    notificationStore,
+  } = useAppContext();
   const onLinkReceived = useCallback(
     async (_event: IpcRendererEvent, link: string) => {
       const parsed = parseDeepLink(link);
@@ -25,13 +31,12 @@ const App: React.FC = () => {
         await deeplinkStore.setDeeplink(parsed);
         await authStore.signInWithToken(parsed.token);
       } catch (e) {
-        notificationStore.setErrorNotification('Invalid token');
-      }
-      finally {
+        notificationStore.setErrorNotification("Invalid token");
+      } finally {
         setIsLoading(false);
       }
     },
-    [authStore, deeplinkStore, notificationStore, setIsLoading],
+    [authStore, deeplinkStore, notificationStore, setIsLoading]
   );
 
   useEffect(() => {
@@ -47,8 +52,9 @@ const App: React.FC = () => {
     api.applicationVersions.checkLatestVersion().catch((error) => {
       alert(
         error?.data?.message ||
-          "Error while checking latest version from Sidetime app. Please restart again or download the latest version at https://sidetime.com/download-app.",
+          "Error while checking latest version from Sidetime app. Please restart again or download the latest version at https://sidetime.com/download-app."
       );
+      console.log(error);
     });
   }, []);
 
