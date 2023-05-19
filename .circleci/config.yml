@@ -74,7 +74,7 @@ commands:
                 bundle exec rails s -u puma -d -p 8080
           - run:
               name: Wait for backend
-              command: dockerize -wait localhost:8080 -timeout 1m
+              command: dockerize -wait http://localhost:8080 -timeout 1m
 jobs:
   test:
     executor: test-executor
