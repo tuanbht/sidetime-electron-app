@@ -33,6 +33,7 @@ executors:
       REACT_APP_SYSTEM_ACCESS_KEY: system-access-key
       ELECTRON_ENABLE_LOGGING: 1
       DEBUG: pw:browser*
+      DEFAULT_URL_HOST: http://localhost:8080/
 
 commands:
   prepare-for-testing:

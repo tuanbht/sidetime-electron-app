@@ -54,7 +54,7 @@ const App: React.FC = () => {
         error?.data?.message ||
           "Error while checking latest version from Sidetime app. Please restart again or download the latest version at https://sidetime.com/download-app."
       );
-      console.log(JSON.stringify(error));
+      console.log("checkLatestVersion", JSON.stringify(error));
     });
   }, []);
 
