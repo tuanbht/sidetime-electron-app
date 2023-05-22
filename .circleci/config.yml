@@ -93,6 +93,8 @@ jobs:
       - run: yarn electron-pack:linux --dir
       - run: sudo apt install libgtk-3-0
       - run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" -- npx playwright test
+      - store_artifacts:
+          path: ~/backend/log
 
 workflows:
   version: 2
