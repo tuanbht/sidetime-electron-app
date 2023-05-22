@@ -34,6 +34,7 @@ executors:
       ELECTRON_ENABLE_LOGGING: 1
       DEBUG: pw:browser*
       JWT_SECRET: jwt-secret
+      RAILS_ENV: test
 
 commands:
   prepare-for-testing:
@@ -73,7 +74,7 @@ commands:
                 cd ~/backend
                 bundle exec rails db:create db:schema:load
                 bundle exec rails mockup_data:e2e_testing
-                bundle exec rails s -u puma -d -p 8080
+                bundle exec rails s -u puma -d -p 8080 -b localhost
           - run:
               name: Wait for backend
               command: dockerize -wait http://localhost:8080 -timeout 1m
